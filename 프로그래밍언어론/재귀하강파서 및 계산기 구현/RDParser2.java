@@ -178,10 +178,9 @@ public class RDParser2 {
     while (true) {
       try {
         ch = input.read();
-        if (ch == ' ' || ch == '\t' || ch == '\r')
-          ;
-        else
+        if (!(ch == ' ' || ch == '\t' || ch == '\r')) {
           return ch;
+        }
       } catch (IOException e) {
         System.err.println(e);
       }
