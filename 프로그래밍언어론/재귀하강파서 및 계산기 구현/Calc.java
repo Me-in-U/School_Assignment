@@ -5,7 +5,7 @@ class Calc {
     int value;
     int ch;
     private PushbackInputStream input;
-    final int NUMBER = 256;
+    static final int NUMBER = 256;
 
     Calc(PushbackInputStream is) {
         input = is;
@@ -15,9 +15,9 @@ class Calc {
         while (true) {
             try {
                 ch = input.read();
-                if (ch == ' ' || ch == '\t' || ch == '\r')
-                    ;
-                else if (Character.isDigit(ch)) {
+                if (ch == ' ' || ch == '\t' || ch == '\r') {
+
+                } else if (Character.isDigit(ch)) {
                     value = number();
                     input.unread(ch);
                     return NUMBER;
