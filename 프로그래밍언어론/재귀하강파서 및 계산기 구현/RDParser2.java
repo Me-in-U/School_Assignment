@@ -11,7 +11,7 @@ import java.io.*;
  * <relop> -> '==' | '!=' | '<' | '>' | '<=' | '>='
  * <aexp> -> <term> {+ <term> | - <term>}
  * <term> -> <factor> {* <factor> | / <factor>}
- * <factor> -> [-] ( <number> | (<aexp>) )
+ * <factor> -> [-] ( <number> | (<expr>) )
  * <number> -> <digit> {<digit>}
  * <digit> -> 0|1|2|3|4|5|6|7|8|9
  * 
@@ -29,7 +29,7 @@ public class RDParser2 {
   }
 
   void error() {
-    System.out.printf("parse error : %d\n", token);
+    System.out.printf("syntax error : DEX[%d] CHAR[%c]%n", token, token);
     System.exit(1);
   }
 
@@ -43,10 +43,11 @@ public class RDParser2 {
   }
 
   void match(int c) {
-    if (token == c)
+    if (token == c) {
       token = getToken();
-    else
+    } else {
       error();
+    }
   }
 
   void expr() {
@@ -143,18 +144,16 @@ public class RDParser2 {
   }
 
   void factor() {
-    /* <factor> → [-] ( <number> | (<aexp>) ) */
+    /* <factor> → [-] ( <number> | (<expr>) ) */
     if (token == '-') {
       match('-');
     }
-    if (Character.isDigit(token)) {
-      number();
-    } else if (token == '(') {
+    if (token == '(') {
       match('(');
-      aexp();
+      expr();
       match(')');
     } else {
-      error();
+      number();
     }
   }
 
@@ -168,10 +167,11 @@ public class RDParser2 {
 
   void digit() {
     /* <digit> -> 0|1|...|9 */
-    if (Character.isDigit(token))
+    if (Character.isDigit(token)) {
       match(token);
-    else
+    } else {
       error();
+    }
   }
 
   int getToken() {
