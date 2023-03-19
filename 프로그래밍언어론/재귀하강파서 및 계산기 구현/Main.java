@@ -213,8 +213,6 @@ class Main {
         }
 
         int factor() {
-            /* <factor> → [-] ( <number> | (<aexp>) ) */
-            /* <aexp> -> <expr> */
             /* <factor> → [-] ( <number> | (<expr>) ) */
             int result = 0;
             boolean isMinus = false;
