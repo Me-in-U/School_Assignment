@@ -1,6 +1,6 @@
 import java.io.*;
 
-class Calc {
+class Calc_Song {
   int token;
   int pretoken;
   int value;
@@ -9,7 +9,7 @@ class Calc {
   private PushbackInputStream input;
   final int NUMBER = 256;
 
-  Calc(PushbackInputStream is) {
+  Calc_Song(PushbackInputStream is) {
     input = is;
   }
 
@@ -46,7 +46,7 @@ class Calc {
   void command() {
     /* command -> expr '\n' */
     int result = expr(); // Need to be changed
-    boolean b;
+    // boolean b;
 
     if (result == 1 && check >= 1)
       System.out.println("True");
@@ -232,10 +232,10 @@ class Calc {
   }
 
   public static void main(String args[]) {
-    Calc calc = new Calc(new PushbackInputStream(System.in));
+    Calc_Song calc_song = new Calc_Song(new PushbackInputStream(System.in));
     while (true) {
       System.out.print(">> ");
-      calc.parse();
+      calc_song.parse();
     }
   }
 }

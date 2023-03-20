@@ -15,12 +15,12 @@ import java.io.*;
  * @author Jangwu Jo
  *
  */
-public class RDParser {
+public class RDParserBase {
 
     int token, ch;
     private PushbackInputStream input;
 
-    RDParser(PushbackInputStream is) {
+    RDParserBase(PushbackInputStream is) {
         input = is;
     }
 
@@ -110,7 +110,7 @@ public class RDParser {
     }
 
     public static void main(String[] args) {
-        RDParser parser = new RDParser(new PushbackInputStream(System.in));
+        RDParserBase parser = new RDParserBase(new PushbackInputStream(System.in));
         while (true) {
             System.out.print(">> ");
             parser.parse();

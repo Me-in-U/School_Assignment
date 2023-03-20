@@ -19,13 +19,13 @@ import java.io.*;
  * @author Jangwu Jo
  *
  */
-public class RDParser2 {
+public class RDParser {
 
   int token;
   int ch;
   private PushbackInputStream input;
 
-  RDParser2(PushbackInputStream is) {
+  RDParser(PushbackInputStream is) {
     input = is;
   }
 
@@ -193,7 +193,7 @@ public class RDParser2 {
   }
 
   public static void main(String[] args) {
-    RDParser2 parser = new RDParser2(new PushbackInputStream(System.in));
+    RDParser parser = new RDParser(new PushbackInputStream(System.in));
     while (true) {
       System.out.print(">> ");
       parser.parse();

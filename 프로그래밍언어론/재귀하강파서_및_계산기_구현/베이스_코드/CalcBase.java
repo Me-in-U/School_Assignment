@@ -1,13 +1,14 @@
+
 import java.io.*;
 
-class Calc {
+class CalcBase {
     int token;
     int value;
     int ch;
     private PushbackInputStream input;
     static final int NUMBER = 256;
 
-    Calc(PushbackInputStream is) {
+    CalcBase(PushbackInputStream is) {
         input = is;
     }
 
@@ -113,10 +114,10 @@ class Calc {
     }
 
     public static void main(String args[]) {
-        Calc calc = new Calc(new PushbackInputStream(System.in));
+        CalcBase calcBase = new CalcBase(new PushbackInputStream(System.in));
         while (true) {
             System.out.print(">> ");
-            calc.parse();
+            calcBase.parse();
         }
     }
 }

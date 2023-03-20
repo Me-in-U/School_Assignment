@@ -1,9 +1,9 @@
 import java.io.*;
 
-class Main {
+class Combine {
     private static PushbackInputStream input;
 
-    public static class Calc {
+    public static class Calc_Combioned {
         int token;
         int value;
         int ch;
@@ -253,8 +253,8 @@ class Main {
 
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        RDParser syntaxCheck = new RDParser();
-        Calc calc = new Calc();
+        RDParser_Combioned syntaxCheck = new RDParser_Combioned();
+        Calc_Combioned calc = new Calc_Combioned();
         while (true) {
             System.out.print(">> ");
             String inputString = br.readLine() + '\n';
@@ -269,7 +269,7 @@ class Main {
         }
     }
 
-    public static class RDParser {
+    public static class RDParser_Combioned {
 
         int token;
         int ch;
