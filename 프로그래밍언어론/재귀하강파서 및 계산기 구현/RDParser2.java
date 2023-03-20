@@ -21,7 +21,8 @@ import java.io.*;
  */
 public class RDParser2 {
 
-  int token, ch;
+  int token;
+  int ch;
   private PushbackInputStream input;
 
   RDParser2(PushbackInputStream is) {
@@ -122,11 +123,10 @@ public class RDParser2 {
     while (token == '+' || token == '-') {
       if (token == '+') {
         match('+');
-        term();
       } else {
         match('-');
-        term();
       }
+      term();
     }
   }
 

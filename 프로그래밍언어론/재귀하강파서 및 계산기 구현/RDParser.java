@@ -95,7 +95,7 @@ public class RDParser {
             try {
                 ch = input.read();
                 if (ch == ' ' || ch == '\t' || ch == '\r')
-                    ;
+                    continue;
                 else
                     return ch;
             } catch (IOException e) {

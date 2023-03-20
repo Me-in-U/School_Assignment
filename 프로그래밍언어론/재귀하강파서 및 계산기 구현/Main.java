@@ -1,7 +1,7 @@
 import java.io.*;
 
 class Main {
-    public static PushbackInputStream input;
+    private static PushbackInputStream input;
 
     public static class Calc {
         int token;
@@ -21,50 +21,9 @@ class Main {
         static final int TRUE = 266;
         static final int FALSE = 267;
 
-        int getToken() { /* tokens are characters */
-            while (true) {
-                try {
-                    ch = input.read();
-                    if (ch == ' ' || ch == '\t' || ch == '\r') {
-                        continue;
-                    } else if (Character.isDigit(ch)) {
-                        value = number();
-                        input.unread(ch);
-                        return NUMBER;
-                    } else {
-                        return ch;
-                    }
-                } catch (IOException e) {
-                    System.err.println(e);
-                }
-            }
-        }
-
-        private int number() {
-            /* number -> digit { digit } */
-            int result = ch - '0';
-            try {
-                ch = input.read();
-                while (Character.isDigit(ch)) {
-                    result = 10 * result + ch - '0';
-                    ch = input.read();
-                }
-            } catch (IOException e) {
-                System.err.println(e);
-            }
-            return result;
-        }
-
         void error() {
             // 에러가 났으면 이미 멈췄겠지만,,
             System.out.printf("syntax error : DEX[%d] CHAR[%c]%n", token, token);
-        }
-
-        void match(int c) {
-            if (token == c)
-                token = getToken();
-            else
-                error();
         }
 
         void command() {
@@ -84,13 +43,28 @@ class Main {
                 error();
         }
 
+        void match(int c) {
+            if (token == c)
+                token = getToken();
+            else
+                error();
+        }
+
         int expr() {
             /* <expr> → <bexp> {& <bexp> | ‘|’ <bexp>} | !<expr> | true | false */
             int resultBefore;
             if (token == '!') {
                 match('!');
+                isBoolean = true;
                 resultBefore = NOT;
-                resultBefore = (expr() == TRUE) ? FALSE : TRUE;
+                int resultAfter = expr();
+                if (resultAfter == TRUE) {
+                    resultBefore = FALSE;
+                } else if (resultAfter == FALSE) {
+                    resultBefore = TRUE;
+                } else { // !숫자만
+                    resultBefore = FALSE;
+                }
             } else if (token == 't' || token == 'f') {
                 isBoolean = true;
                 if (token == 't') {
@@ -237,11 +211,44 @@ class Main {
             }
         }
 
+        private int number() {
+            /* number -> digit { digit } */
+            int result = ch - '0';
+            try {
+                ch = input.read();
+                while (Character.isDigit(ch)) {
+                    result = 10 * result + ch - '0';
+                    ch = input.read();
+                }
+            } catch (IOException e) {
+                System.err.println(e);
+            }
+            return result;
+        }
+
+        int getToken() { /* tokens are characters */
+            while (true) {
+                try {
+                    ch = input.read();
+                    if (ch == ' ' || ch == '\t' || ch == '\r') {
+                        continue;
+                    } else if (Character.isDigit(ch)) {
+                        value = number();
+                        input.unread(ch);
+                        return NUMBER;
+                    } else {
+                        return ch;
+                    }
+                } catch (IOException e) {
+                    System.err.println(e);
+                }
+            }
+        }
+
         void parse() {
             token = getToken(); // get the first token
             command(); // call the parsing command
         }
-
     }
 
     public static void main(String[] args) throws IOException {
@@ -251,7 +258,7 @@ class Main {
         while (true) {
             System.out.print(">> ");
             String inputString = br.readLine() + '\n';
-            if (inputString.equals("end")) {
+            if (inputString.equals("\n\n")) {
                 break;
             }
             input = new PushbackInputStream(new ByteArrayInputStream(inputString.getBytes()));
@@ -264,7 +271,8 @@ class Main {
 
     public static class RDParser {
 
-        int token, ch;
+        int token;
+        int ch;
 
         void error() {
             System.out.printf("syntax error : DEX[%d] CHAR[%c]%n", token, token);
