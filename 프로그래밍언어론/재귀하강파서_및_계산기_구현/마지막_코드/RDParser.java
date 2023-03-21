@@ -29,23 +29,45 @@ public class RDParser {
     input = is;
   }
 
-  void error() {
-    System.out.printf("syntax error : DEX[%d] CHAR[%c]%n", token, token);
-    System.exit(1);
-  }
-
-  void command() {
-    /* command -> expr '\n' */
-    expr();
-    if (token == '\n') /* end the parse and print the result */
-      System.out.println("good syntax");
-    else
-      error();
+  public static void main(String[] args) {
+    RDParser parser = new RDParser(new PushbackInputStream(System.in));
+    while (true) {
+      System.out.print(">> ");
+      parser.parse();
+    }
   }
 
   void match(int c) {
     if (token == c) {
       token = getToken();
+    } else {
+      error();
+    }
+  }
+
+  void parse() {
+    token = getToken(); // get the first character
+    command(); // call the parsing command
+  }
+
+  int getToken() {
+    while (true) {
+      try {
+        ch = input.read();
+        if (!(ch == ' ' || ch == '\t' || ch == '\r')) {
+          return ch;
+        }
+      } catch (IOException e) {
+        System.err.println(e);
+      }
+    }
+  }
+
+  void command() {
+    /* command -> expr '\n' */
+    expr();
+    if (token == '\n') {/* end the parse and print the result */
+      System.out.println("good syntax");
     } else {
       error();
     }
@@ -174,29 +196,8 @@ public class RDParser {
     }
   }
 
-  int getToken() {
-    while (true) {
-      try {
-        ch = input.read();
-        if (!(ch == ' ' || ch == '\t' || ch == '\r')) {
-          return ch;
-        }
-      } catch (IOException e) {
-        System.err.println(e);
-      }
-    }
-  }
-
-  void parse() {
-    token = getToken(); // get the first character
-    command(); // call the parsing command
-  }
-
-  public static void main(String[] args) {
-    RDParser parser = new RDParser(new PushbackInputStream(System.in));
-    while (true) {
-      System.out.print(">> ");
-      parser.parse();
-    }
+  void error() {
+    System.out.printf("syntax error : DEX[%d] CHAR[%c]%n", token, token);
+    System.exit(1);
   }
 }

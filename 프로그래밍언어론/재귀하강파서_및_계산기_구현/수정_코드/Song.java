@@ -32,7 +32,7 @@ class Calc_Song {
   }
 
   void error() {
-    System.out.printf("parse error : %d\n", ch);
+    System.out.printf("parse error : %d%n", ch);
     System.exit(1);
   }
 
@@ -46,7 +46,7 @@ class Calc_Song {
   void command() {
     /* command -> expr '\n' */
     int result = expr(); // Need to be changed
-    // boolean b;
+    boolean b;
 
     if (result == 1 && check >= 1)
       System.out.println("True");

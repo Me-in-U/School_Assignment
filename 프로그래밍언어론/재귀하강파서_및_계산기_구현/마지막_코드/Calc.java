@@ -7,7 +7,7 @@ class Calc {
     int ch;
     boolean isBoolean = false;
     private PushbackInputStream input;
-    static final int NUMBER = 256;
+    static final int NUMBER = 256; // number
     static final int EQ = 257; // equals
     static final int NEQ = 258; // not equals
     static final int ST = 259; // smaller than
@@ -24,9 +24,45 @@ class Calc {
         input = is;
     }
 
-    void error() {
-        System.out.printf("syntax error : DEX[%d] CHAR[%c]%n", token, token);
-        System.exit(1);
+    public static void main(String[] args) {
+        Calc calc = new Calc(new PushbackInputStream(System.in));
+        while (true) {
+            System.out.print(">> ");
+            calc.parse();
+            calc.isBoolean = false;
+        }
+    }
+
+    void match(int c) {
+        if (token == c) {
+            token = getToken();
+        } else {
+            error();
+        }
+    }
+
+    void parse() {
+        token = getToken(); // get the first token
+        command(); // call the parsing command
+    }
+
+    int getToken() { /* tokens are characters */
+        while (true) {
+            try {
+                ch = input.read();
+                if (ch == ' ' || ch == '\t' || ch == '\r') {
+                    continue;
+                } else if (Character.isDigit(ch)) {
+                    value = number();
+                    input.unread(ch);
+                    return NUMBER;
+                } else {
+                    return ch;
+                }
+            } catch (IOException e) {
+                System.err.println(e);
+            }
+        }
     }
 
     void command() {
@@ -42,15 +78,9 @@ class Calc {
                     System.out.println("false");
                 }
             }
-        } else
+        } else {
             error();
-    }
-
-    void match(int c) {
-        if (token == c)
-            token = getToken();
-        else
-            error();
+        }
     }
 
     int expr() {
@@ -225,36 +255,8 @@ class Calc {
         return result;
     }
 
-    int getToken() { /* tokens are characters */
-        while (true) {
-            try {
-                ch = input.read();
-                if (ch == ' ' || ch == '\t' || ch == '\r') {
-                    continue;
-                } else if (Character.isDigit(ch)) {
-                    value = number();
-                    input.unread(ch);
-                    return NUMBER;
-                } else {
-                    return ch;
-                }
-            } catch (IOException e) {
-                System.err.println(e);
-            }
-        }
-    }
-
-    void parse() {
-        token = getToken(); // get the first token
-        command(); // call the parsing command
-    }
-
-    public static void main(String[] args) {
-        Calc calc = new Calc(new PushbackInputStream(System.in));
-        while (true) {
-            System.out.print(">> ");
-            calc.parse();
-            calc.isBoolean = false;
-        }
+    void error() {
+        System.out.printf("syntax error : DEX[%d] CHAR[%c]%n", token, token);
+        System.exit(1);
     }
 }
