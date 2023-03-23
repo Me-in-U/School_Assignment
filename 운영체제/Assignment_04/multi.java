@@ -1,3 +1,5 @@
+package 운영체제.Assignment_04;
+
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.FileOutputStream;
@@ -10,8 +12,8 @@ import java.util.StringTokenizer;
 
 public class multi {
   public static void main(String[] args) throws IOException {
-    BufferedOutputStream bs = new BufferedOutputStream(new FileOutputStream("multi.out"));
-    BufferedReader br = new BufferedReader(new FileReader("multi.inp"));
+    BufferedOutputStream bs = new BufferedOutputStream(new FileOutputStream("운영체제/Assignment_04/multi.out"));
+    BufferedReader br = new BufferedReader(new FileReader("운영체제/Assignment_04/1.inp"));
     int N = Integer.parseInt(br.readLine());
     LinkedList<Deque<Integer>> programList = new LinkedList<>();
     for (int i = 0; i < N; i++) {
@@ -26,10 +28,9 @@ public class multi {
     }
     int timeIdle = 0;
     int timeNow = 0;
-    int programs = programList.size();
     int processNum = 0;
+    int programs = programList.size();
     while (processNum < programs) {
-      boolean isIdle = true;
       Deque<Integer> processTimeData = programList.remove(processNum);
       int isIO = processTimeData.poll();
       int processEndTime = processTimeData.poll();
@@ -41,7 +42,7 @@ public class multi {
           processTimeData.addFirst(isIO);
           programList.add(processNum, processTimeData);
           processNum++;
-          if (isIdle && processNum == programs) {
+          if (processNum == programs) {
             timeNow++;
             timeIdle++;
             processNum = 0;
@@ -57,13 +58,12 @@ public class multi {
           processEndTime = timeNow + cpuTime;
           timeNow += cpuTime;
         }
-        if (cpuTime != 0 && ioTime != 0 && processTimeData.size() > 1) {
+        if (cpuTime != -1 && ioTime != -1 && processTimeData.size() > 1) {
           processEndTime += ioTime;
           isIO = 1;
           processTimeData.addFirst(processEndTime);
           processTimeData.addFirst(isIO);
           programList.add(processNum, processTimeData);
-          isIdle = false;
         } else if (ioTime != -1 && processTimeData.size() == 1 && programList.isEmpty()) {
           timeNow += ioTime;
           break;
@@ -72,7 +72,7 @@ public class multi {
       }
       programs = programList.size();
     }
-    // System.out.println(timeIdle + " " + timeNow);
+    System.out.println(timeIdle + " " + timeNow);
     StringBuilder sb = new StringBuilder();
     sb.append(timeIdle + " " + timeNow);
     bs.write(sb.toString().getBytes());
