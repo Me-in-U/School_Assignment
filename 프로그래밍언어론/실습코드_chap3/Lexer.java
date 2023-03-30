@@ -1,5 +1,4 @@
 package 프로그래밍언어론.실습코드_chap3;
-// Lexer.java
 
 // Lexical analyzer for S
 
@@ -14,6 +13,7 @@ public class Lexer {
 
     public Lexer(String fileName) { // source filename
         try {
+            System.out.println("input = new BufferedReader(new FileReader(" + fileName + "))");
             input = new BufferedReader(new FileReader(fileName));
         } catch (FileNotFoundException e) {
             System.out.println("File not found: " + fileName);
@@ -22,6 +22,7 @@ public class Lexer {
     }
 
     public Lexer() { // from standard input
+        System.out.println("input = new BufferedReader(new InputStreamReader(System.in))");
         input = new BufferedReader(new InputStreamReader(System.in));
     }
 
@@ -39,6 +40,7 @@ public class Lexer {
 
     public Token getToken() { // Return next token
         do {
+            // 읽은 문자가 알파벳 문자
             if (Character.isLetter(ch)) { // ident or keyword
                 String s = "";
                 do {
@@ -47,7 +49,7 @@ public class Lexer {
                 } while (Character.isLetter(ch) || Character.isDigit(ch));
                 return Token.idORkeyword(s);
             }
-
+            // 읽은 문자가 숫자 : 정수리터럴
             if (Character.isDigit(ch)) { // number
                 String s = "";
                 do {
@@ -56,14 +58,13 @@ public class Lexer {
                 } while (Character.isDigit(ch));
                 return Token.NUMBER.setValue(s);
             }
-
+            // 나머지는 읽은 문자에 따라 연산자, 구분자 등을 인식하여 리턴
             switch (ch) {
                 case ' ':
                 case '\t':
                 case '\r':
                     ch = getchar();
                     break;
-
                 case eolnCh:
                     ch = getchar();
                     if (ch == '\r') // for Windows
@@ -71,7 +72,6 @@ public class Lexer {
                     if (ch == eolnCh && interactive)
                         return Token.EOF;
                     break;
-
                 case '/': // divide
                     ch = getchar();
                     if (ch != '/')
@@ -81,7 +81,6 @@ public class Lexer {
                     } while (ch != eolnCh);
                     ch = getchar();
                     break;
-
                 case '\"': // string literal
                     String s = "";
                     while ((ch = getchar()) != '\"')
@@ -170,12 +169,15 @@ public class Lexer {
         // System.exit(1);
     }
 
-    static public void main(String[] args) {
+    public static void main(String[] args) {
         Lexer lexer;
-        if (args.length == 0)
+        if (args.length == 0) {
+            System.out.println("Lexer()");
             lexer = new Lexer();
-        else
+        } else {
+            System.out.println("new Lexer(args[0])");
             lexer = new Lexer(args[0]);
+        }
 
         Token tok = lexer.getToken();
         while (tok != Token.EOF) {

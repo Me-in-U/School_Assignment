@@ -7,6 +7,19 @@ import java.util.*;
 abstract class Command {
     // Command = Decl | Function | Stmt
     Type type = Type.UNDEF;
+
+    public void display(int l) {
+    }
+}
+
+class Indent {
+    public static void display(int level, String s) {
+        String tab = "";
+        for (int i = 0; i < level; i++) {
+            tab = tab + "   ";
+        }
+        System.out.println(tab + s);
+    }
 }
 
 class Decls extends ArrayList<Decl> {
@@ -14,10 +27,14 @@ class Decls extends ArrayList<Decl> {
 
     Decls() {
         super();
-    }
+    };
 
     Decls(Decl d) {
         this.add(d);
+    }
+
+    public void display(int l) {
+        Indent.display(l, "Decls");
     }
 }
 
@@ -28,25 +45,51 @@ class Decl extends Command {
     int arraysize = 0;
 
     Decl(String s, Type t) {
+        System.out.println("Decl 1");
         id = new Identifier(s);
         type = t;
     } // declaration
 
     Decl(String s, Type t, int n) {
+        System.out.println("Decl 2");
         id = new Identifier(s);
         type = t;
         arraysize = n;
     } // array declaration
 
     Decl(String s, Type t, Expr e) {
+        System.out.println("Decl 3");
         id = new Identifier(s);
         type = t;
         expr = e;
     } // declaration
+
+    @Override
+    public void display(int level) {
+        Indent.display(level, "Decl");
+        type.display(level + 1);
+        id.display(level + 1);
+        if (expr != null) {
+            expr.display(level + 1);
+        }
+    }
 }
 
 class Functions extends ArrayList<Function> {
     // Functions = Function*
+    public ArrayList<Function> functions = new ArrayList<>();
+
+    Functions() {
+        super();
+    }
+
+    Functions(Function f) {
+        this.add(f);
+    }
+
+    public void display(int l) {
+        Indent.display(l, "Functions");
+    }
 }
 
 class Function extends Command {
@@ -64,6 +107,13 @@ class Function extends Command {
 
     public String toString() {
         return id.toString() + params.toString();
+    }
+
+    @Override
+    public void display(int level) {
+        Indent.display(level, "Function");
+        id.display(level + 1);
+        stmt.display(level + 1);
     }
 }
 
@@ -89,6 +139,10 @@ class Type {
     public String toString() {
         return id;
     }
+
+    public void display(int level) {
+        Indent.display(level, "Type: " + id);
+    }
 }
 
 class ProtoType extends Type {
@@ -113,7 +167,7 @@ class Empty extends Stmt {
 
 class Stmts extends Stmt {
     // Stmts = Stmt*
-    public ArrayList<Stmt> stmts = new ArrayList<Stmt>();
+    public ArrayList<Stmt> stmts = new ArrayList<>();
 
     Stmts() {
         super();
@@ -121,6 +175,11 @@ class Stmts extends Stmt {
 
     Stmts(Stmt s) {
         stmts.add(s);
+    }
+
+    @Override
+    public void display(int level) {
+        Indent.display(level, "Stmts");
     }
 }
 
@@ -131,13 +190,22 @@ class Assignment extends Stmt {
     Expr expr;
 
     Assignment(Identifier t, Expr e) {
+        System.out.println("Assignment 1");
         id = t;
         expr = e;
     }
 
     Assignment(Array a, Expr e) {
+        System.out.println("Assignment 2");
         ar = a;
         expr = e;
+    }
+
+    @Override
+    public void display(int level) {
+        Indent.display(level, "Assignment");
+        id.display(level + 1);
+        expr.display(level + 1);
     }
 }
 
@@ -157,6 +225,17 @@ class If extends Stmt {
         stmt1 = tp;
         stmt2 = ep;
     }
+
+    @Override
+    public void display(int level) {
+        Indent.display(level, "if");
+        expr.display(level + 2);
+        stmt1.display(level + 2);
+        if (!(stmt2 instanceof Empty)) {
+            Indent.display(level, "else");
+            stmt2.display(level + 2);
+        }
+    }
 }
 
 class While extends Stmt {
@@ -168,6 +247,15 @@ class While extends Stmt {
         expr = t;
         stmt = b;
     }
+
+    @Override
+    public void display(int level) {
+        Indent.display(level, "While");
+        Indent.display(level + 1, "Condition:");
+        expr.display(level + 2);
+        Indent.display(level + 1, "Do:");
+        stmt.display(level + 2);
+    }
 }
 
 class Let extends Stmt {
@@ -177,16 +265,29 @@ class Let extends Stmt {
     Stmts stmts;
 
     Let(Decls ds, Stmts ss) {
+        System.out.println("Let 1");
         decls = ds;
         funs = null;
         stmts = ss;
     }
 
     Let(Decls ds, Functions fs, Stmts ss) {
+        System.out.println("Let 2");
         decls = ds;
         funs = fs;
         stmts = ss;
     }
+
+    @Override
+    public void display(int level) {
+        Indent.display(level, "Let");
+        decls.display(level + 1);
+        if (funs != null) {
+            funs.display(level + 1);
+        }
+        stmts.display(level + 1);
+    }
+
 }
 
 class Read extends Stmt {
@@ -196,6 +297,11 @@ class Read extends Stmt {
     Read(Identifier v) {
         id = v;
     }
+
+    @Override
+    public void display(int level) {
+        Indent.display(level, "Read ");
+    }
 }
 
 class Print extends Stmt {
@@ -204,6 +310,12 @@ class Print extends Stmt {
 
     Print(Expr e) {
         expr = e;
+    }
+
+    @Override
+    public void display(int level) {
+        Indent.display(level, "PRINT");
+        expr.display(level + 1);
     }
 }
 
@@ -215,6 +327,14 @@ class Return extends Stmt {
         fid = new Identifier(s);
         expr = e;
     }
+
+    @Override
+    public void display(int level) {
+        Indent.display(level, "Return");
+        fid.display(level + 1);
+        expr.display(level + 1);
+    }
+
 }
 
 class Try extends Stmt {
@@ -228,6 +348,15 @@ class Try extends Stmt {
         stmt1 = s1;
         stmt2 = s2;
     }
+
+    @Override
+    public void display(int level) {
+        Indent.display(level, "TRY");
+        eid.display(level + 1);
+        stmt1.display(level + 1);
+        Indent.display(level, "EXCEPT");
+        stmt2.display(level + 1);
+    }
 }
 
 class Raise extends Stmt {
@@ -236,10 +365,33 @@ class Raise extends Stmt {
     Raise(Identifier id) {
         eid = id;
     }
+
+    @Override
+    public void display(int level) {
+        Indent.display(level, "RAISE");
+        eid.display(level + 1);
+    }
 }
 
 class Exprs extends ArrayList<Expr> {
     // Exprs = Expr*
+    public ArrayList<Expr> exprs = new ArrayList<>();
+
+    Exprs() {
+        super();
+    }
+
+    Exprs(Expr s) {
+        exprs.add(s);
+    }
+
+    // @Override
+    // public void display(int level) {
+    // Indent.display(level, "Exprs");
+    // for (Expr expr : exprs) {
+    // expr.display(level + 1);
+    // }
+    // }
 }
 
 abstract class Expr extends Stmt {
@@ -254,6 +406,12 @@ class Call extends Expr {
     Call(Identifier id, Exprs a) {
         fid = id;
         args = a;
+    }
+
+    @Override
+    public void display(int level) {
+        Indent.display(level, "Call");
+        fid.display(level + 1);
     }
 }
 
@@ -272,6 +430,11 @@ class Identifier extends Expr {
     public boolean equals(Object obj) {
         String s = ((Identifier) obj).id;
         return id.equals(s);
+    }
+
+    @Override
+    public void display(int level) {
+        Indent.display(level, "Identifier: " + id.toString());
     }
 }
 
@@ -325,6 +488,10 @@ class Value extends Expr {
         value = v;
         undef = false;
     }
+
+    Value(boolean v) {
+        value = v;
+    } // value
 
     Object value() {
         return value;
@@ -383,6 +550,11 @@ class Value extends Expr {
             return "" + arrValue();
         return "undef";
     }
+
+    @Override
+    public void display(int level) {
+        Indent.display(level, "Value: " + value);
+    }
 }
 
 class Binary extends Expr {
@@ -395,6 +567,14 @@ class Binary extends Expr {
         expr1 = e1;
         expr2 = e2;
     } // binary
+
+    @Override
+    public void display(int level) {
+        Indent.display(level, "Binary");
+        Indent.display(level + 1, "Operator: " + op.val);
+        expr1.display(level + 1);
+        expr2.display(level + 1);
+    }
 }
 
 class Unary extends Expr {
@@ -407,6 +587,12 @@ class Unary extends Expr {
         expr = e;
     } // unary
 
+    @Override
+    public void display(int level) {
+        Indent.display(level, "Unary");
+        Indent.display(level + 1, "Operator: " + op.val);
+        expr.display(level + 1);
+    }
 }
 
 class Operator {

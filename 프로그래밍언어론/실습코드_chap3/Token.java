@@ -1,20 +1,30 @@
 package 프로그래밍언어론.실습코드_chap3;
 
 // Token.java
+import java.lang.Enum;
 
 enum Token {
-
-    BOOL("bool"), CHAR("char"), ELSE("else"), FALSE("false"), FLOAT("float"),
-    STRING("string"), IF("if"), INT("int"), TRUE("true"), WHILE("while"),
-    RETURN("return"), VOID("void"), FUN("fun"), THEN("then"), LET("let"),
-    IN("in"), END("end"), READ("read"), PRINT("print"), DO("do"), FOR("for"),
-    EOF("<<EOF>>"),
+    // 타입
+    BOOL("bool"), TRUE("true"), FALSE("false"), VOID("void"),
+    CHAR("char"), INT("int"), FLOAT("float"), STRING("string"),
+    // if
+    IF("if"), ELSE("else"), THEN("then"),
+    // let in end
+    LET("let"), IN("in"), END("end"),
+    // while
+    WHILE("while"), DO("do"),
+    // etc
+    RETURN("return"), FUN("fun"),
+    READ("read"), PRINT("print"), FOR("for"),
+    // 구분자
     LBRACE("{"), RBRACE("}"), LBRACKET("["), RBRACKET("]"),
-    LPAREN("("), RPAREN(")"), SEMICOLON(";"), COMMA(","),
+    LPAREN("("), RPAREN(")"), SEMICOLON(";"), COMMA(","), EOF("<<EOF>>"),
+    // 연산자
     ASSIGN("="), EQUAL("=="), LT("<"), LTEQ("<="), GT(">"),
     GTEQ(">="), NOT("!"), NOTEQ("!="), PLUS("+"), MINUS("-"),
-    MULTIPLY("*"), DIVIDE("/"), AND("&"), OR("|"), ID(""),
-    NUMBER(""), STRLITERAL("");
+    MULTIPLY("*"), DIVIDE("/"), AND("&"), OR("|"),
+    // ""
+    ID(""), NUMBER(""), STRLITERAL("");
 
     private String value;
 
