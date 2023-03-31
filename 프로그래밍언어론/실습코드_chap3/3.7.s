@@ -1,4 +1,4 @@
-let int y; in
+let int y;int y; in
 y = y + 1;
 x = x + y;
 end;

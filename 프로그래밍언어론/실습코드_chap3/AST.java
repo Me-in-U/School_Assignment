@@ -15,9 +15,15 @@ abstract class Command {
 class Indent {
     public static void display(int level, String s) {
         String tab = "";
-        for (int i = 0; i < level; i++) {
-            tab = tab + "   ";
+        if (level >= 1) {
+            for (int i = 0; i < level - 1; i++) {
+                tab = tab + "  ";
+            }
+            for (int i = 0; i < 1; i++) {
+                tab = tab + "┗━";
+            }
         }
+
         System.out.println(tab + s);
     }
 }
@@ -27,7 +33,7 @@ class Decls extends ArrayList<Decl> {
 
     Decls() {
         super();
-    };
+    }
 
     Decls(Decl d) {
         this.add(d);
@@ -35,6 +41,9 @@ class Decls extends ArrayList<Decl> {
 
     public void display(int l) {
         Indent.display(l, "Decls");
+        for (Decl d : this) {
+            d.display(l + 1);
+        }
     }
 }
 
@@ -45,20 +54,17 @@ class Decl extends Command {
     int arraysize = 0;
 
     Decl(String s, Type t) {
-        System.out.println("Decl 1");
         id = new Identifier(s);
         type = t;
     } // declaration
 
     Decl(String s, Type t, int n) {
-        System.out.println("Decl 2");
         id = new Identifier(s);
         type = t;
         arraysize = n;
     } // array declaration
 
     Decl(String s, Type t, Expr e) {
-        System.out.println("Decl 3");
         id = new Identifier(s);
         type = t;
         expr = e;
@@ -89,6 +95,9 @@ class Functions extends ArrayList<Function> {
 
     public void display(int l) {
         Indent.display(l, "Functions");
+        for (Function f : this) {
+            f.display(l + 1);
+        }
     }
 }
 
@@ -112,8 +121,14 @@ class Function extends Command {
     @Override
     public void display(int level) {
         Indent.display(level, "Function");
+        type.display(level + 1);
         id.display(level + 1);
-        stmt.display(level + 1);
+        if (params != null) {
+            params.display(level + 1);
+        }
+        if (stmt != null) {
+            stmt.display(level + 1);
+        }
     }
 }
 
@@ -180,6 +195,9 @@ class Stmts extends Stmt {
     @Override
     public void display(int level) {
         Indent.display(level, "Stmts");
+        for (Stmt s : stmts) {
+            s.display(level + 1);
+        }
     }
 }
 
@@ -190,13 +208,11 @@ class Assignment extends Stmt {
     Expr expr;
 
     Assignment(Identifier t, Expr e) {
-        System.out.println("Assignment 1");
         id = t;
         expr = e;
     }
 
     Assignment(Array a, Expr e) {
-        System.out.println("Assignment 2");
         ar = a;
         expr = e;
     }
@@ -229,11 +245,12 @@ class If extends Stmt {
     @Override
     public void display(int level) {
         Indent.display(level, "if");
-        expr.display(level + 2);
-        stmt1.display(level + 2);
+        expr.display(level + 1);
+        Indent.display(level, "then");
+        stmt1.display(level + 1);
         if (!(stmt2 instanceof Empty)) {
             Indent.display(level, "else");
-            stmt2.display(level + 2);
+            stmt2.display(level + 1);
         }
     }
 }
@@ -251,9 +268,9 @@ class While extends Stmt {
     @Override
     public void display(int level) {
         Indent.display(level, "While");
-        Indent.display(level + 1, "Condition:");
+        Indent.display(level + 1, "Condition");
         expr.display(level + 2);
-        Indent.display(level + 1, "Do:");
+        Indent.display(level + 1, "Do");
         stmt.display(level + 2);
     }
 }
@@ -265,14 +282,12 @@ class Let extends Stmt {
     Stmts stmts;
 
     Let(Decls ds, Stmts ss) {
-        System.out.println("Let 1");
         decls = ds;
         funs = null;
         stmts = ss;
     }
 
     Let(Decls ds, Functions fs, Stmts ss) {
-        System.out.println("Let 2");
         decls = ds;
         funs = fs;
         stmts = ss;
@@ -301,6 +316,7 @@ class Read extends Stmt {
     @Override
     public void display(int level) {
         Indent.display(level, "Read ");
+        id.display(level + 1);
     }
 }
 
@@ -331,7 +347,6 @@ class Return extends Stmt {
     @Override
     public void display(int level) {
         Indent.display(level, "Return");
-        fid.display(level + 1);
         expr.display(level + 1);
     }
 
@@ -385,13 +400,12 @@ class Exprs extends ArrayList<Expr> {
         exprs.add(s);
     }
 
-    // @Override
-    // public void display(int level) {
-    // Indent.display(level, "Exprs");
-    // for (Expr expr : exprs) {
-    // expr.display(level + 1);
-    // }
-    // }
+    public void display(int level) {
+        Indent.display(level, "Exprs");
+        for (Expr expr : exprs) {
+            expr.display(level + 1);
+        }
+    }
 }
 
 abstract class Expr extends Stmt {
@@ -412,6 +426,7 @@ class Call extends Expr {
     public void display(int level) {
         Indent.display(level, "Call");
         fid.display(level + 1);
+        args.display(level + 1);
     }
 }
 

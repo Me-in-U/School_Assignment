@@ -97,9 +97,9 @@ public class Parser {
 
     private Decls params() {
         Decls params = new Decls();
-
+        // dddddddddddddddddddddddd
         // parse declrations of parameters
-
+        params = decls();
         return params;
     }
 
@@ -403,7 +403,7 @@ public class Parser {
         if (args.length == 0) {
             System.out.print(">> ");
             Lexer.interactive = true;
-            parser = new Parser(new Lexer("프로그래밍언어론/실습코드_chap3/3.7.s"));
+            parser = new Parser(new Lexer("프로그래밍언어론/실습코드_chap3/3.5.s"));
             // parser = new Parser(new Lexer());
             do {
                 if (parser.token == Token.EOF) {

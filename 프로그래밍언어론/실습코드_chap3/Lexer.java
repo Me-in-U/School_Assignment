@@ -22,7 +22,8 @@ public class Lexer {
     }
 
     public Lexer() { // from standard input
-        System.out.println("input = new BufferedReader(new InputStreamReader(System.in))");
+        // System.out.println("input = new BufferedReader(new
+        // InputStreamReader(System.in))");
         input = new BufferedReader(new InputStreamReader(System.in));
     }
 
