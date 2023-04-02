@@ -83,8 +83,6 @@ class Decl extends Command {
 
 class Functions extends ArrayList<Function> {
     // Functions = Function*
-    public ArrayList<Function> functions = new ArrayList<>();
-
     Functions() {
         super();
     }
@@ -390,19 +388,14 @@ class Raise extends Stmt {
 
 class Exprs extends ArrayList<Expr> {
     // Exprs = Expr*
-    public ArrayList<Expr> exprs = new ArrayList<>();
 
     Exprs() {
         super();
     }
 
-    Exprs(Expr s) {
-        exprs.add(s);
-    }
-
     public void display(int level) {
         Indent.display(level, "Exprs");
-        for (Expr expr : exprs) {
+        for (Expr expr : this) {
             expr.display(level + 1);
         }
     }

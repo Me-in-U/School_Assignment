@@ -1,4 +1,1 @@
-let int y;int y; in
-y = y + 1;
-x = x + y;
-end;
+x*fact(x-1);
