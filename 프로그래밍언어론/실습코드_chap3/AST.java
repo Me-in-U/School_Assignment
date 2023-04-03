@@ -73,7 +73,9 @@ class Decl extends Command {
     @Override
     public void display(int level) {
         Indent.display(level, "Decl");
-        type.display(level + 1);
+        if (type != null) {
+            type.display(level + 1);
+        }
         id.display(level + 1);
         if (expr != null) {
             expr.display(level + 1);

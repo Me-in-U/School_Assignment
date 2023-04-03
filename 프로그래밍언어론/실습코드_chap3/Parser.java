@@ -74,12 +74,9 @@ public class Parser {
             d = new Decl(id, t, e);
         } else
             d = new Decl(id, t);
-        // 마지막에 ; , 오는지
-        if (token == Token.SEMICOLON) {
-            match(Token.SEMICOLON);
-        } else if (token == Token.COMMA) {
-            match(Token.COMMA);
-        }
+        // 마지막에 ; 오는지
+        match(Token.SEMICOLON);
+
         return d;
     }
 
@@ -101,7 +98,21 @@ public class Parser {
 
     private Decls params() {
         Decls params = new Decls();
-        params = decls();
+        while (isType() || !isType()) {
+            if (isType()) {
+                Type t = type();
+                Decl d = new Decl(match(Token.ID), t);
+                params.add(d);
+            } else {
+                Decl d = new Decl(match(Token.ID), null);
+                params.add(d);
+            }
+            if (token == Token.RPAREN) {
+                break;
+            } else if (token == Token.COMMA) {
+                match(Token.COMMA);
+            }
+        }
         return params;
     }
 
