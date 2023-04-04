@@ -1,4 +1,4 @@
-package 프로그래밍언어론.실습코드_chap3;
+package 프로그래밍언어론.언어S의_파서_구현;
 
 // Parser for language S
 
@@ -414,9 +414,13 @@ public class Parser {
         Parser parser;
         Command command = null;
         if (args.length == 0) {
-            System.out.print(">> ");
             Lexer.interactive = true;
-            parser = new Parser(new Lexer("프로그래밍언어론/실습코드_chap3/3.6.s"));
+            // !파일로 입력하기
+            String filename = "프로그래밍언어론/실습코드_chap3/3.6.s";
+            parser = new Parser(new Lexer(filename));
+            System.out.println(filename);
+            // !직접 입력하기
+            // System.out.print(">> ");
             // parser = new Parser(new Lexer());
             do {
                 if (parser.token == Token.EOF) {
@@ -429,6 +433,7 @@ public class Parser {
                 } catch (Exception e) {
                     System.err.println(e);
                 }
+                // !직접 입력할때 아래 주석 제거
                 // System.out.print("\n>> ");
             } while (true);
         } else {

@@ -1,4 +1,4 @@
-package 프로그래밍언어론.실습코드_chap3;
+package 프로그래밍언어론.언어S의_파서_구현;
 
 // AST.java
 // AST for S
@@ -16,12 +16,13 @@ class Indent {
     public static void display(int level, String s) {
         String tab = "";
         if (level >= 1) {
-            for (int i = 0; i < level - 1; i++) {
+            for (int i = 0; i < level; i++)
                 tab = tab + "  ";
-            }
-            for (int i = 0; i < 1; i++) {
-                tab = tab + "┗━";
-            }
+            // !Note: 다른 방식으로 표현
+            // for (int i = 0; i < level - 1; i++)
+            // tab = tab + " ";
+            // for (int i = 0; i < 1; i++)
+            // tab = tab + "┗━";
         }
 
         System.out.println(tab + s);

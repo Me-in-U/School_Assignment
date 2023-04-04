@@ -1,4 +1,4 @@
-package 프로그래밍언어론.실습코드_chap3;
+package 프로그래밍언어론.언어S의_파서_구현;
 
 // Token.java
 import java.lang.Enum;
