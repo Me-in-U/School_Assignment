@@ -38,6 +38,7 @@ public class fcfs {
     int nowTime = 0;
     int[] endTime = new int[N];
     PriorityQueue<Process> readyQueue = new PriorityQueue<>();
+    // !입력
     for (int i = 0; i < N; i++) {
       StringTokenizer st = new StringTokenizer(br.readLine());
       int createTime = Integer.parseInt(st.nextToken());
@@ -47,6 +48,7 @@ public class fcfs {
       }
       readyQueue.add(new Process(i, createTime, cpuIO));
     }
+    // !풀이
     while (!readyQueue.isEmpty()) {
       Process process = readyQueue.poll();
       if (process.readyQueueInTime <= nowTime) {
@@ -69,6 +71,7 @@ public class fcfs {
         readyQueue.add(process);
       }
     }
+    // !출력
     StringBuilder sb = new StringBuilder();
     sb.append(idleTime).append('\n');
     for (int i = 0; i < N; i++) {
