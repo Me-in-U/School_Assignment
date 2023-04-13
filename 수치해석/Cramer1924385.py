@@ -1,26 +1,26 @@
-# |이 코드는 크래머의 규칙을 이용하여 선형방정식을 푸는 코드입니다.
-# |
-# |좋은 점:
-# |- 코드가 간결하고 이해하기 쉽습니다.
-# |- 함수를 이용하여 중복되는 코드를 줄였습니다.
-# |- 파일 입출력을 이용하여 입력과 출력을 처리합니다.
-# |
-# |나쁜 점:
-# |- 변수명이 짧아서 의미 파악이 어렵습니다. 변수명을 더 구체적으로 작성하면 코드의 가독성이 높아질 것입니다.
-# |- 입력 파일의 형식이 고정되어 있어서 다른 형식의 입력 파일을 처리할 수 없습니다. 예외 처리를 추가하면 더욱 안정적인 코드가 될 것입니다.
-# |
-
-
+# 2X2 Matrix det 계산
 def get_det2(a):
     return a[0][0]*a[1][1] - a[0][1]*a[1][0]
 
+# 3X3 Matrix det 계산
+
 
 def get_det3(a):
-    return a[0][0]*(a[1][1]*a[2][2] - a[1][2]*a[2][1]) - a[0][1]*(a[1][0]*a[2][2] - a[1][2]*a[2][0]) + a[0][2]*(a[1][0]*a[2][1] - a[1][1]*a[2][0])
+    return (a[0][0]*(a[1][1]*a[2][2] - a[1][2]*a[2][1])
+            - a[0][1]*(a[1][0]*a[2][2] - a[1][2]*a[2][0])
+            + a[0][2]*(a[1][0]*a[2][1] - a[1][1]*a[2][0]))
+
+# 3X3 Matrix det 계산 ver.2
+# def get_det3_ver2(a):
+#     return (a[0][0] * get_det2([a[1][1:], a[2][1:]])
+#             - a[0][1] * get_det2([a[1][::2], a[2][::2]])
+#             + a[0][2] * get_det2([a[1][:3], a[2][:3]]))
 
 
-# A입력
+# 파일 open 'r', 'w'
 input_txt = open("cramer_in.txt", 'r')
+output_txt = open("cramer_out.txt", 'w')
+# A입력
 A = list()
 A.append(list(map(int, input_txt.readline().split())))
 A.append(list(map(int, input_txt.readline().split())))
@@ -67,7 +67,6 @@ x.append(det_A2/det_A)
 if n == 3:
     x.append(det_A3/det_A)
 # 출력
-output_txt = open("cramer_out.txt", 'w')
 last_print = str()
 for index, value in enumerate(x):
     last_print += "x"+str(index+1)+" = "+str(value)+"\n"
