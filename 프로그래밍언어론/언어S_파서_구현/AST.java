@@ -1,4 +1,4 @@
-package 프로그래밍언어론.언어S의_파서_구현;
+package 프로그래밍언어론.언어S_파서_구현;
 
 // AST.java
 // AST for S

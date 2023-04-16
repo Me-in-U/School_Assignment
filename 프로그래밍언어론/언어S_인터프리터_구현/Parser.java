@@ -1,7 +1,6 @@
-package 프로그래밍언어론.언어S의_파서_구현;
+package 프로그래밍언어론.언어S_인터프리터_구현;
 
 // Parser for language S
-
 public class Parser {
     Token token; // current token
     Lexer lexer;
@@ -75,9 +74,20 @@ public class Parser {
         } else
             d = new Decl(id, t);
         // 마지막에 ; 오는지
-        match(Token.SEMICOLON);
-
+        if (token == Token.SEMICOLON) {
+            match(Token.SEMICOLON);
+        }
         return d;
+    }
+
+    private Functions functions() {
+        // <decls> -> {<decl>}
+        Functions fs = new Functions();
+        while (token == Token.FUN) {
+            Function f = function();
+            fs.add(f);
+        }
+        return fs;
     }
 
     private Function function() {
@@ -88,8 +98,7 @@ public class Parser {
         funId = str;
         Function f = new Function(str, t);
         match(Token.LPAREN);
-        if (token != Token.RPAREN)
-            f.params = params();
+        f.params = params();
         match(Token.RPAREN);
         Stmt s = stmt();
         f.stmt = s;
@@ -155,7 +164,7 @@ public class Parser {
             case IF: // if statement
                 s = ifStmt();
                 return s;
-            case WHILE: // while statement
+            case WHILE, FOR, DO: // while statement
                 s = whileStmt();
                 return s;
             case ID: // assignment
@@ -191,11 +200,18 @@ public class Parser {
         // <letStmt> -> let <decls> in <block> end
         match(Token.LET);// let 토큰 매치
         Decls ds = decls();// 변수 선언 파싱
+        Functions fs = null;
+        if (token == Token.FUN) {
+            fs = functions();// fun 선언 파싱
+        }
         match(Token.IN);// in 토큰 매치
         Stmts ss = stmts();// 본체 문장들 파싱
         match(Token.END);// end 토큰 매치
         match(Token.SEMICOLON);// 세미콜론 매치
-        return new Let(ds, null, ss);// AST 구성 및 리턴
+        if (fs != null) {
+            return new Let(ds, fs, ss);// AST 구성 및 리턴
+        }
+        return new Let(ds, ss);
     }
 
     private Read readStmt() {
@@ -262,13 +278,43 @@ public class Parser {
     }
 
     private While whileStmt() {
+        While w = null;
         // <whileStmt> -> while (<expr>) <stmt>
-        match(Token.WHILE);
-        match(Token.LPAREN);
-        Expr e = expr();
-        match(Token.RPAREN);
-        Stmt s = stmt();
-        return new While(e, s);
+        if (token == Token.WHILE) {
+            match(Token.WHILE);
+            match(Token.LPAREN);
+            Expr e = expr();
+            match(Token.RPAREN);
+            Stmt s = stmt();
+            w = new While(e, s);
+        }
+        // <whileStmt> -> do <stmt> while (<expr>)
+        else if (token == Token.DO) {
+            match(Token.DO);
+            Stmt s = stmt();
+            match(Token.WHILE);
+            match(Token.LPAREN);
+            Expr e = expr();
+            match(Token.RPAREN);
+            w = new While(e, s);
+        }
+        // <whileStmt> -> for (<type> id = <expr>; <expr>; id = <expr>) <stmt>
+        else if (token == Token.FOR) {
+            match(Token.FOR);
+            match(Token.LPAREN);
+            Decl a = decl();
+            Expr b = expr();
+            match(Token.SEMICOLON);
+            Identifier id = new Identifier(match(Token.ID));
+            match(Token.ASSIGN);
+            Expr e = expr();
+            Stmt c = new Assignment(id, e);
+            match(Token.RPAREN);
+            Stmt d = stmt();
+            w = new While(a, b, c, d);
+        }
+
+        return w;
     }
 
     private Expr expr() {
@@ -416,7 +462,7 @@ public class Parser {
         if (args.length == 0) {
             Lexer.interactive = true;
             // !파일로 입력하기
-            String filename = "프로그래밍언어론/실습코드_chap3/3.6.s";
+            String filename = "프로그래밍언어론/언어S_인터프리터_구현/for.s";
             parser = new Parser(new Lexer(filename));
             System.out.println(filename);
             // !직접 입력하기

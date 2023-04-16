@@ -19,56 +19,63 @@ def get_det3(a):
 
 # 파일 open 'r', 'w'
 input_txt = open("cramer_in.txt", 'r')
-output_txt = open("cramer_out.txt", 'w')
-# A입력
-A = list()
-A.append(list(map(int, input_txt.readline().split())))
-A.append(list(map(int, input_txt.readline().split())))
-n = len(A[0])
-if n == 3:
-    A.append(list(map(int, input_txt.readline().split())))
-# B입력
-B = list()
-B.append(int(input_txt.readline()))
-B.append(int(input_txt.readline()))
-if n == 3:
-    B.append(int(input_txt.readline()))
-input_txt.close()
-# det(A) 계산
-if n == 2:
-    det_A = get_det2(A)
-else:
-    det_A = get_det3(A)
-# det(A1) 계산
-if n == 2:
-    det_A1 = get_det2([[B[0], A[0][1]],
-                       [B[1], A[1][1]]])
-else:
-    det_A1 = get_det3([[B[0], A[0][1], A[0][2]],
-                       [B[1], A[1][1], A[1][2]],
-                       [B[2], A[2][1], A[2][2]]])
-# det(A2) 계산
-if n == 2:
-    det_A2 = get_det2([[A[0][0], B[0]],
-                      [A[1][0], B[1]]])
-else:
-    det_A2 = get_det3([[A[0][0], B[0], A[0][2]],
-                       [A[1][0], B[1], A[1][2]],
-                       [A[2][0], B[2], A[2][2]]])
-# det(A3) 계산
-if n == 3:
-    det_A3 = get_det3([[A[0][0], A[0][1], B[0]],
-                       [A[1][0], A[1][1], B[1]],
-                       [A[2][0], A[2][1], B[2]]])
-# x계산
-x = list()
-x.append(det_A1/det_A)
-x.append(det_A2/det_A)
-if n == 3:
-    x.append(det_A3/det_A)
-# 출력
+output_txt = open("cramer_out.txt", 'w', encoding="utf-8")
 last_print = str()
-for index, value in enumerate(x):
-    last_print += "x"+str(index+1)+" = "+str(value)+"\n"
+count = 1
+while True:
+    line = input_txt.readline()
+    if not line:
+        input_txt.close()
+        break
+    # A입력
+    A = list()
+    A.append(list(map(int, line.split())))
+    A.append(list(map(int, input_txt.readline().split())))
+    n = len(A[0])
+    if n == 3:
+        A.append(list(map(int, input_txt.readline().split())))
+    # B입력
+    B = list()
+    B.append(int(input_txt.readline()))
+    B.append(int(input_txt.readline()))
+    if n == 3:
+        B.append(int(input_txt.readline()))
+    # det(A) 계산
+    if n == 2:
+        det_A = get_det2(A)
+    else:
+        det_A = get_det3(A)
+    # det(A1) 계산
+    if n == 2:
+        det_A1 = get_det2([[B[0], A[0][1]],
+                           [B[1], A[1][1]]])
+    else:
+        det_A1 = get_det3([[B[0], A[0][1], A[0][2]],
+                           [B[1], A[1][1], A[1][2]],
+                           [B[2], A[2][1], A[2][2]]])
+    # det(A2) 계산
+    if n == 2:
+        det_A2 = get_det2([[A[0][0], B[0]],
+                           [A[1][0], B[1]]])
+    else:
+        det_A2 = get_det3([[A[0][0], B[0], A[0][2]],
+                           [A[1][0], B[1], A[1][2]],
+                           [A[2][0], B[2], A[2][2]]])
+    # det(A3) 계산
+    if n == 3:
+        det_A3 = get_det3([[A[0][0], A[0][1], B[0]],
+                           [A[1][0], A[1][1], B[1]],
+                           [A[2][0], A[2][1], B[2]]])
+    # x계산
+    x = list()
+    x.append(det_A1/det_A)
+    x.append(det_A2/det_A)
+    if n == 3:
+        x.append(det_A3/det_A)
+    # 출력
+    last_print += str(count)+"번째"+"\n"
+    for index, value in enumerate(x):
+        last_print += "x"+str(index+1)+" = "+str(value)+"\n"
+    count += 1
 output_txt.write(last_print)
 output_txt.close()
