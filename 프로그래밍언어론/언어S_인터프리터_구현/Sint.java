@@ -145,16 +145,23 @@ public class Sint {
     State Eval(While l, State state) {
         if (l.decl != null) {
             Decls decls = new Decls();
-            decls.add((Decl) l.decl);
+            decls.add(l.decl);
+            // System.out.println("for문");
             State s = allocate(decls, state);
-            if (V(l.expr, state).boolValue()) {
+            while (V(l.expr, s).boolValue()) {
                 s = Eval(l.stmt, s);
                 s = Eval(l.stmt2, s);
             }
-            return free(decls, s);
-        } else {
+            s = free(decls, s);
+            return s;
+        } else if (l.whileDoFor == 0) {
+            // System.out.println("while문");
             if (V(l.expr, state).boolValue())
                 return Eval(l, Eval(l.stmt, state));
+        } else if (l.whileDoFor == 1) {
+            // System.out.println("do-while문");
+            l.whileDoFor = 0;
+            return Eval(l, Eval(l.stmt, state));
         }
         return state;
     }
@@ -162,7 +169,8 @@ public class Sint {
     State Eval(Let l, State state) {
         State s = allocate(l.decls, state);
         s = Eval(l.stmts, s);
-        return free(l.decls, s);
+        s = free(l.decls, s);
+        return s;
     }
 
     // Todo: let문 구현을 위한 allocate 함수와 free 함수를 구현
@@ -336,13 +344,13 @@ public class Sint {
                     command = parser.command();
                     // !AST 출력
                     if (command != null)
-                        command.display(0); // display AST
-                    if (command == null)
-                        throw new NullPointerException();
-                    else {
-                        command.type = TypeChecker.Check(command);
-                        System.out.println("\nType: " + command.type);
-                    }
+                        // command.display(0); // display AST
+                        if (command == null)
+                            throw new NullPointerException();
+                        else {
+                            command.type = TypeChecker.Check(command);
+                            System.out.println("\nType: " + command.type);
+                        }
                 } catch (Exception e) {
                     System.out.println(e);
                     System.out.print(">> ");

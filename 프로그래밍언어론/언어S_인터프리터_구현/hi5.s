@@ -5,9 +5,9 @@ in
     while (i<=3) {
         j=1;
         while (j<=4) {
-            k = i * j; 
-            print i; print j; print k;
-            j=j+1;
+           k = i * j; 
+           print i; print j; print k;
+           j=j+1;
         }
         i = i+1;
     }

@@ -261,18 +261,21 @@ class While extends Stmt {
     Decl decl = null;
     Expr expr;
     Stmt stmt;
-    Stmt stmt2;
+    Stmt stmt2 = null;
+    int whileDoFor;
 
-    While(Expr t, Stmt b) {
+    While(Expr t, Stmt st1, int whileDo) {
         expr = t;
-        stmt = b;
+        stmt = st1;
+        whileDoFor = whileDo;
     }
 
-    While(Decl a, Expr b, Stmt c, Stmt d) {
+    While(Decl a, Expr b, Stmt st1, Stmt st2) {
         decl = a;
         expr = b;
-        stmt = d;
-        stmt2 = c;
+        stmt = st1;
+        stmt2 = st2;
+        whileDoFor = 2;
     }
 
     @Override

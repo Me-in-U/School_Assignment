@@ -247,7 +247,8 @@ public class Parser {
 
         match(Token.ASSIGN);
         Expr e = expr();
-        match(Token.SEMICOLON);
+        if (token == Token.SEMICOLON)
+            match(Token.SEMICOLON);
         return new Assignment(id, e);
     }
 
@@ -286,7 +287,7 @@ public class Parser {
             Expr e = expr();
             match(Token.RPAREN);
             Stmt s = stmt();
-            w = new While(e, s);
+            w = new While(e, s, 0);
         }
         // <whileStmt> -> do <stmt> while (<expr>)
         else if (token == Token.DO) {
@@ -296,7 +297,7 @@ public class Parser {
             match(Token.LPAREN);
             Expr e = expr();
             match(Token.RPAREN);
-            w = new While(e, s);
+            w = new While(e, s, 1);
         }
         // <whileStmt> -> for (<type> id = <expr>; <expr>; id = <expr>) <stmt>
         else if (token == Token.FOR) {
@@ -308,12 +309,11 @@ public class Parser {
             Identifier id = new Identifier(match(Token.ID));
             match(Token.ASSIGN);
             Expr e = expr();
-            Stmt c = new Assignment(id, e);
+            Stmt st2 = new Assignment(id, e);
             match(Token.RPAREN);
-            Stmt d = stmt();
-            w = new While(a, b, c, d);
+            Stmt st1 = stmt();
+            w = new While(a, b, st1, st2);
         }
-
         return w;
     }
 

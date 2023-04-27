@@ -1,6 +1,5 @@
 fun int f(int x, bool y) 
-let 
-    int result;
+let int result;
 in
     if (y) then 
        result = x * x; 

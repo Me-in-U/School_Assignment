@@ -46,7 +46,7 @@ public class TypeChecker {
 
         Type t = Check(f.stmt, te); // type check the function body
         if (t != f.type)
-            error(f, "incorrect return type1");
+            error(f, "incorrect return type");
 
         for (Decl d : f.params)
             te.pop();
@@ -56,7 +56,7 @@ public class TypeChecker {
             te.push(f.id, new ProtoType(f.type, f.params));
             return f.type;
         } else {
-            error(f, "incorrect return type2");
+            error(f, "incorrect return type");
             return Type.ERROR;
         }
     }
@@ -252,6 +252,11 @@ public class TypeChecker {
     }
 
     static Type Check(While l, TypeEnv te) {
+        if (l.stmt2 != null) {
+            Decls decls = new Decls();
+            decls.add(l.decl);
+            addType(decls, te);
+        }
         Type t = Check(l.expr, te);
         Type t1 = Check(l.stmt, te);
         if (t == Type.BOOL)
@@ -262,6 +267,11 @@ public class TypeChecker {
         else
             error(l, "non-bool test in loop");
         // System.out.println(l.type);
+        if (l.stmt2 != null) {
+            Decls decls = new Decls();
+            decls.add(l.decl);
+            addType(decls, te);
+        }
         return l.type;
     }
 

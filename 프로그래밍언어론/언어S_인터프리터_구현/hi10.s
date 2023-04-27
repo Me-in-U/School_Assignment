@@ -1,13 +1,13 @@
 int i = 1;
 
 fun int f(int x) {
-    i = i + x; 
-    return i;
+     i = i + x; 
+     return i;
 }
 
 fun int g(int x) {
-    i = i + x*x;
-    return i;
+     i = i + x*x;
+     return i;
 }
 
 let
