@@ -1,49 +1,42 @@
-# !2X2 Matrix det 계산
-def get_det2(a):
-    return a[0][0]*a[1][1] - a[0][1]*a[1][0]
-
-# !3X3 Matrix det 계산
-def get_det3(a):
-    return (a[0][0]*(a[1][1]*a[2][2] - a[1][2]*a[2][1])
-            - a[0][1]*(a[1][0]*a[2][2] - a[1][2]*a[2][0])
-            + a[0][2]*(a[1][0]*a[2][1] - a[1][1]*a[2][0]))
+def pivoting(p):
+  for i in range(p,n):
+   for j in range(i,n):
+     if abs(A[j][i]) > abs(A[i][i]):
+        A[i], A[j] = A[j],A[i]
+        B[i], B[j] = B[j],B[i]
 
 # !파일 open 'r', 'w'
 input_txt = open("수치해석\Gaussian_elimination_method\gauss_in.txt", 'r')
 output_txt = open(
     "수치해석\Gaussian_elimination_method\gauss_out.txt", 'w', encoding="utf-8")
-# !A입력
-A = list()
-while True:
-    line = input_txt.readline()
-    if line == "\n":
-        break
-    A.append(list(map(int, line.split())))
-print("A행렬", A)
-n = len(A[0])
-# !B입력
-B = list()
-for i in range(n):
-    B.append(list(map(int, input_txt.readline().split())))
-print("B행렬", B)
-#!소거
+# !A,B입력
+A = []
+while (line := input_txt.readline().strip()):
+    A.append(list(map(float, line.split())))
+n = len(A)
+B = [list(map(float, input_txt.readline().split())) for _ in range(n)]
+input_txt.close()
+# !소거
 for i in range(n-1):
+  pivoting(i)
   for j in range(i+1, n):
     divider = A[j][i] / A[i][i]
     for k in range(n):
       A[j][k] -= divider * A[i][k]
     B[j][0] -= divider * B[i][0]
-#!X계산
-X = list()
+# !X계산
+X = [0] * n
+for i in range(n-1, -1, -1):
+    X[i] = (B[i][0] - sum(A[i][j] * X[j] for j in range(i+1, n))) / A[i][i]
+# !출력
+last_print = "Gauss 소거법 완료 후 행렬(피봇팅 적용)\n"
+str_list = [list(map(str, row)) for row in A]
+max_length = max(len(s) for row in str_list for s in row)
+format_stL = f"{{:>{max_length}}}"
 for i in range(n):
-    X.append([0] * n)
-for i in range(n-1, 0, -1):
-  
-#!출력
-last_print = str()
-last_print += "A                 B\n"
-for i in range(n):
-    for j in range(n):
-        last_print += str(A[i][j]) + " "
-    last_print += "         "+ str(B[i][0])+"\n"
+    last_print += " ".join([format_stL.format(s) for s in str_list[i]]) + '\n'
+last_print += '\n'
+last_print += '\n'.join([f"X{i+1} = {X[i]}" for i in range(n)])
 output_txt.write(last_print)
+output_txt.close()
+print(last_print)

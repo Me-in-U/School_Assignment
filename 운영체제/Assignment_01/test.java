@@ -25,8 +25,8 @@ public class test {
   }
 
   public static void main(String[] args) throws IOException {
-    BufferedOutputStream bs = new BufferedOutputStream(new FileOutputStream("Assignment_01/test.out"));
-    BufferedReader br = new BufferedReader(new FileReader("Assignment_01/1.inp"));
+    BufferedOutputStream bs = new BufferedOutputStream(new FileOutputStream("운영체제/Assignment_01/test.out"));
+    BufferedReader br = new BufferedReader(new FileReader("운영체제/Assignment_01/1.inp"));
     // BufferedOutputStream bs = new BufferedOutputStream(new
     // FileOutputStream("members[i].LastName"));
     // BufferedReader br = new BufferedReader(new FileReader("test.inp"));
