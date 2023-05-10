@@ -21,7 +21,7 @@ public class banker {
 
   public static void main(String[] args) throws IOException {
     BufferedOutputStream bs = new BufferedOutputStream(new FileOutputStream("운영체제/Assignment_09/banker.out"));
-    BufferedReader br = new BufferedReader(new FileReader("운영체제/Assignment_09/1.inp"));
+    BufferedReader br = new BufferedReader(new FileReader("운영체제/Assignment_09/banker.inp"));
     StringTokenizer st = new StringTokenizer(br.readLine());
     N = Integer.parseInt(st.nextToken());
     M = Integer.parseInt(st.nextToken());
@@ -49,22 +49,9 @@ public class banker {
         need[i][j] -= data;
       }
     }
-    System.out.println(N + " " + M);
-    for (int i = 0; i < N; i++) {
-      for (int j = 0; j < M; j++) {
-        System.out.print(need[i][j] + " ");
-      }
-      System.out.println();
-    }
-    for (int i = 0; i < M; i++) {
-      System.out.print(available[i] + " ");
-    }
-    // !계산
-    int cccc = 1;
     System.out.println();
     br.readLine();
     while (true) {
-      System.out.println(cccc++ + "번째");
       st = new StringTokenizer(br.readLine());
       String requestOrRelease = st.nextToken();
       if (!requestOrRelease.equals("quit")) {
@@ -74,12 +61,8 @@ public class banker {
         }
         if (requestOrRelease.equals("request")) {
           if (checkNeed(rorData)) {
-            if (checkAvailable(rorData)) {
-              if (checkSafe(rorData)) {
-                request(rorData);
-              } else {
-                queue.add(rorData);
-              }
+            if (checkAvailable(rorData) && checkSafe(rorData)) {
+              request(rorData);
             } else {
               queue.add(rorData);
             }
@@ -146,8 +129,7 @@ public class banker {
       for (int i = 0; i < N; i++) {
         if (!done[i]) {
           if (checkAvailable(safeNeed[i], safeAvailable)) {
-            System.out.println(i + "번 프로세스");
-            for (int j = 0; j < N; j++) {
+            for (int j = 0; j < M; j++) {
               safeAvailable[j] += safeAllocation[i][j];
             }
             done[i] = true;
@@ -158,11 +140,9 @@ public class banker {
         }
       }
       if (!doneSomething) {
-        System.out.println("false");
         return false;
       }
     }
-    System.out.println("true");
     return true;
   }
 
@@ -195,10 +175,12 @@ public class banker {
     Queue<int[]> temp = new LinkedList<>();
     while (!queue.isEmpty()) {
       int[] rorData = queue.poll();
-      if (checkAvailable(rorData)) {
-        request(rorData);
-      } else {
-        temp.add(rorData);
+      if (checkNeed(rorData)) {
+        if (checkAvailable(rorData) && checkSafe(rorData)) {
+          request(rorData);
+        } else {
+          temp.add(rorData);
+        }
       }
     }
     queue = temp;
