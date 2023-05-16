@@ -56,7 +56,7 @@ public class allocation {
 
   public static void main(String[] args) throws IOException {
     BufferedOutputStream bs = new BufferedOutputStream(new FileOutputStream("운영체제/Assignment_10/allocation.out"));
-    BufferedReader br = new BufferedReader(new FileReader("운영체제/Assignment_10/1.inp"));
+    BufferedReader br = new BufferedReader(new FileReader("운영체제/Assignment_10/0.inp"));
     n = Integer.parseInt(br.readLine().trim());
     List<Process> processes = new LinkedList<>();
     for (int i = 0; i < n; i++) {
@@ -71,6 +71,14 @@ public class allocation {
     StringBuilder sb = new StringBuilder();
     List<Process> newProcesses = null;
     for (int i = 0; i < 3; i++) {
+      if (i == 0) {
+        System.out.println("First Fit");
+      } else if (i == 1) {
+        System.out.println("Best Fit");
+      } else {
+        System.out.println("Worst Fit");
+      }
+      System.out.println("INIT MEMORY : <0 -1 1000>");
       newProcesses = new LinkedList<>(processes);
       sb.append(MemoryAllocation(i, newProcesses)).append('\n');
     }
