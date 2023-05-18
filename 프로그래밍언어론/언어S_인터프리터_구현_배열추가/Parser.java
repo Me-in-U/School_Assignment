@@ -59,6 +59,7 @@ public class Parser {
         return ds;
     }
 
+    // Todo : 배열 구현을 위해 수정 o
     private Decl decl() {
         // <decl> -> <type> id [=<expr>];
         // 타입 type
@@ -71,6 +72,11 @@ public class Parser {
             match(Token.ASSIGN);
             Expr e = expr();
             d = new Decl(id, t, e);
+        } else if (token == Token.LBRACKET) {
+            match(Token.LBRACKET);
+            String n = match(Token.NUMBER);
+            match(Token.RBRACKET);
+            d = new Decl(id, t, Integer.parseInt(n));
         } else
             d = new Decl(id, t);
         // 마지막에 ; 오는지
@@ -238,13 +244,24 @@ public class Parser {
         return new Return(funId, e);
     }
 
+    // Todo : 배열 구현을 위해 수정
     private Stmt assignment() {
         // <assignment> -> id = <expr>;
         Identifier id = new Identifier(match(Token.ID));
 
         if (token == Token.LPAREN) // function call
             return call(id);
-
+        else if (token == Token.LBRACKET) {// array access
+            match(Token.LBRACKET);
+            Expr indexExpr = expr();
+            match(Token.RBRACKET);
+            Array array = new Array(id, indexExpr);
+            match(Token.ASSIGN);
+            Expr valueExpr = expr();
+            if (token == Token.SEMICOLON)
+                match(Token.SEMICOLON);
+            return new Assignment(array, valueExpr);
+        }
         match(Token.ASSIGN);
         Expr e = expr();
         if (token == Token.SEMICOLON)
@@ -382,6 +399,7 @@ public class Parser {
         return t;// 항의 AST 리턴
     }
 
+    // Todo : 배열 구현을 위해 수정
     private Expr factor() {
         // <factor> -> [-](id | <call> | literal | '('<expr> ')')
         Operator op = null;
@@ -398,6 +416,12 @@ public class Parser {
                     Call c = new Call(v, arguments());
                     match(Token.RPAREN);
                     e = c;
+                } else if (token == Token.LBRACKET) { // Array access
+                    match(Token.LBRACKET);
+                    Expr indexExpr = expr();
+                    match(Token.RBRACKET);
+                    Array array = new Array(v, indexExpr);
+                    e = array;
                 }
                 break;
             case NUMBER: // 정수 혹은 스트링 리터럴 파싱
@@ -462,7 +486,7 @@ public class Parser {
         if (args.length == 0) {
             Lexer.interactive = true;
             // !파일로 입력하기
-            String filename = "프로그래밍언어론/언어S_인터프리터_구현/for.s";
+            String filename = "프로그래밍언어론/언어S_인터프리터_구현_배열추가/for.s";
             parser = new Parser(new Lexer(filename));
             System.out.println(filename);
             // !직접 입력하기

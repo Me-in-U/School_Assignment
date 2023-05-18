@@ -100,9 +100,39 @@ public class Sint {
         return state;
     }
 
+    // Todo : 배열 구현을 위해 수정
     State Eval(Assignment a, State state) {
-        Value v = V(a.expr, state);
-        return state.set(a.id, v);
+        // 배열 이름이 나타내는 배열의
+        // 배열 요소에 대입
+        if (state.get(a.id) instanceof Value) {
+            Value array = state.get(a.id);
+            Identifier id = a.id;
+            Expr indexExpr = a.expr;
+            Value indexValue = V(indexExpr, state);
+            if (indexValue.type() != Type.INT) {
+                throw new IllegalArgumentException("Invalid array index type");
+            }
+
+            Value arrayValue = (Value) state.get(id);
+            if (arrayValue == null || arrayValue.type() != Type.ARRAY) {
+                throw new IllegalArgumentException("Invalid array access");
+            }
+
+            Value[] arrayData = array.arrValue();
+            int index = indexValue.intValue();
+
+            if (index < 0 || index >= arrayData.length) {
+                throw new IndexOutOfBoundsException("Array index out of bounds");
+            }
+
+            Value v = V(a.expr, state);
+            arrayData[index] = v;
+
+            return state.set(id, v);
+        } else {
+            Value v = V(a.expr, state);
+            return state.set(a.id, v);
+        }
     }
 
     State Eval(Read r, State state) {
@@ -175,14 +205,23 @@ public class Sint {
 
     // Todo: let문 구현을 위한 allocate 함수와 free 함수를 구현
     // !선언된 변수들(ds)을 위한 엔트리들을 상태 state에 추가
+    // Todo : 배열 구현을 위해 수정
+    // !배열 선언에 대해서 배열을 만들어서
+    // !(id, new Value[])을 state에 push 함
     State allocate(Decls ds, State state) {
         if (ds != null) {
             for (Decl d : ds) {
                 Identifier id = d.id;
-                if (d.expr != null) {
-                    state.push(id, V(d.expr, state));
+                if (d.arraysize != 0) {
+                    int size = d.arraysize;
+                    Object newArray = new Value[size];
+                    state.push(id, (Value) newArray);
                 } else {
-                    state.push(id, null);
+                    if (d.expr != null) {
+                        state.push(id, V(d.expr, state));
+                    } else {
+                        state.push(id, null);
+                    }
                 }
             }
         }
@@ -290,6 +329,7 @@ public class Sint {
         System.err.println(msg);
     }
 
+    // Todo : 배열 구현을 위해 수정
     Value V(Expr e, State state) {
         if (e instanceof Value)
             return (Value) e;
@@ -320,6 +360,27 @@ public class Sint {
             // Value returnValue = finalState.get(new Identifier("return"));
             // return returnValue;
             return V((Call) e, state);
+        }
+        // 배열 이름이 나타내는 배열에서
+        // 배열 요소 id[<expr>]의 값 리턴
+        if (e instanceof Array) {
+            Array array = (Array) e;
+            Identifier id = array.id;
+            Expr indexExpr = array.expr;
+            Value arrayValue = (Value) state.get(id);
+            Value indexValue = V(indexExpr, state);
+
+            if (arrayValue != null && arrayValue.type() == Type.ARRAY && indexValue.type() == Type.INT) {
+                Value[] arrayData = arrayValue.arrValue();
+                int index = indexValue.intValue();
+                if (index >= 0 && index < arrayData.length) {
+                    return arrayData[index];
+                } else {
+                    throw new IndexOutOfBoundsException("Array index out of bounds");
+                }
+            } else {
+                throw new IllegalArgumentException("Invalid array access");
+            }
         }
         throw new IllegalArgumentException("no operation");
     }
