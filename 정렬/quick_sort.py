@@ -1,169 +1,118 @@
 """
 @author: 김민규(1924385)
-@date: 2023-09-23
-@todo: quick sorting methods
+@date: 2023-09-23~26
+@todo: quick sorting methods for Hoare's Partition Algorithm with different pivot choices
 """
 
 import pandas as pd
 import timeit
 import random
+import sys
+sys.setrecursionlimit(10**6)
 
 
-#!Hoare Partition Scheme(중간 인덱스)
-def hoare_partition(arr, left, right):
+#!Hoare Partition
+def hoare_partition(arr, left, right, method):
     if left < right:
-        pivot_index = hoare_partition_center_pivot(arr, left, right)
-        hoare_partition(arr, left, pivot_index)
-        hoare_partition(arr, pivot_index + 1, right)
+        pivot_index = hoare_partition_process(arr, left, right, method)
+        hoare_partition(arr, left, pivot_index - 1, method)
+        hoare_partition(arr, pivot_index + 1, right, method)
     return arr
 
 
-def hoare_partition_center_pivot(arr, left, right):
-    pivot = arr[(left + right) // 2]  # 중간 인덱스를 피벗으로 설정
+# !median_of ? 피봇 구하는 방법
+def median_of_three_pivot(arr, left, right):
+    n = right - left + 1
+    if n == 1:
+        return left
+    elif n == 2:
+        return left if arr[left] < arr[right] else right
+    center = (left + right) // 2
+    candidates = [(arr[left], left), (arr[center], center),
+                  (arr[right], right)]
+    candidates.sort()
+    _, pivot_index = candidates[1]
+    return pivot_index
+
+
+def median_of_medians_pivot(arr, low, high):
+    sub_arr = arr[low:high+1]
+    n = len(sub_arr)
+    if n <= 3:
+        sublists = [sub_arr]
+    else:
+        step = n // 3
+        sublists = [sub_arr[:step], sub_arr[step:2*step], sub_arr[2*step:]]
+    medians = [sorted(sublist)[len(sublist)//2] for sublist in sublists]
+    if len(medians) <= 3:
+        pivot = sorted(medians)[len(medians)//2]
+    else:
+        pivot = median_of_medians_pivot(medians, 0, len(medians) - 1)
+    return low + sub_arr.index(pivot)
+
+
+# !옮기는 과정
+def hoare_partition_process(arr, left, right, method):
+    # !피봇 정하기
+    if method == 0:
+        pivot_index = (left + right) // 2
+    elif method == 1:
+        pivot_index = random.randint(left, right)
+    elif method == 2:
+        pivot_index = median_of_three_pivot(arr, left, right)
+    elif method == 3:
+        pivot_index = median_of_medians_pivot(arr, left, right)
+    pivot = arr[pivot_index]
+
+    # !옮기기 시작
+    arr[left], arr[pivot_index] = arr[pivot_index], arr[left]
+    left_pivot_index = left
+    left += 1
+
     while True:
-        while arr[left] < pivot:
+        while left <= right and arr[left] <= pivot:
             left += 1
-        while arr[right] > pivot:
+        while arr[right] >= pivot and right >= left:
             right -= 1
-        if left >= right:
-            return right
+        if right < left:
+            break
         arr[left], arr[right] = arr[right], arr[left]
-        left += 1
-        right -= 1
+
+    arr[left_pivot_index], arr[right] = arr[right], arr[left_pivot_index]
+    # !right는 새로운 피봇 인덱스
+    return right
 
 
-# !median_of_medians
-def find_median(arr):
-    arr.sort()  # 배열 정렬
-    return arr[len(arr) // 2]  # 중앙값 반환
+# !과제 엑셀 파일로 테스트
+file_path = '정렬/input_quick_sort.xlsx'
+data = pd.read_excel(file_path, header=None)
+arr = data.iloc[:, 0].tolist()
+# !랜덤 배열로 테스트
+arr = [random.randint(0, 100) for _ in range(100000)]
+# print(arr)
 
 
-def median_of_medians(arr):
-    if len(arr) <= 3:
-        return find_median(arr)
+# !퀵 정렬(Hoare Partition Scheme)의 실행 시간 측정
+# !Center Pivot -> Median of Three Pivot -> Median of Medians Pivot -> Random Pivot 순서
+methods = {
+    0: 'Center Pivot            ',
+    1: 'Random Pivot            ',
+    2: 'Median of Three Pivot   ',
+    3: 'Median of Medians Pivot '
+}
 
-    size = len(arr) // 3
-    sub_arrays = [arr[i:i+size] for i in range(0, len(arr), size)]
-
-    medians = [find_median(sub_array) for sub_array in sub_arrays]
-    return find_median(medians)
-
-
-def median_of_medians_pivot(arr):
-    if len(arr) <= 1:
-        return arr
-    pivot = median_of_medians(arr)
-    low = [x for x in arr if x < pivot]
-    equal = [x for x in arr if x == pivot]
-    high = [x for x in arr if x > pivot]
-    return median_of_medians_pivot(low) + equal + median_of_medians_pivot(high)
-
-
-# !median_of_three
-def find_median_of_three(arr):
-    left = arr[0]
-    middle = arr[len(arr) // 2]
-    right = arr[-1]
-    # 세 값 중 중앙값 찾기
-    return sorted([left, middle, right])[1]
-
-
-def median_of_three_pivot(arr):
-    if len(arr) <= 1:
-        return arr  # 기본 케이스: 배열의 길이가 1 이하인 경우 배열 반환
-    pivot = find_median_of_three(arr)  # 피벗 찾기
-    left = [x for x in arr if x < pivot]  # 피벗보다 작은 요소
-    middle = [x for x in arr if x == pivot]  # 피벗과 같은 요소
-    right = [x for x in arr if x > pivot]  # 피벗보다 큰 요소
-    # 재귀적으로 정렬 및 결합
-    return median_of_three_pivot(left) + middle + median_of_three_pivot(right)
-
-
-#! 랜덤 피벗
-def random_pivot(arr):
-    if len(arr) <= 1:
-        return arr  # 기본 케이스: 배열의 길이가 1 이하인 경우 배열 반환
-    pivot_index = random.randint(0, len(arr) - 1)  # 랜덤 피벗 인덱스 선택
-    pivot = arr[pivot_index]  # 피벗 선택
-    left = [x for x in arr if x < pivot]  # 피벗보다 작은 요소
-    middle = [x for x in arr if x == pivot]  # 피벗과 같은 요소
-    right = [x for x in arr if x > pivot]  # 피벗보다 큰 요소
-    # 재귀적으로 정렬 및 결합
-    return random_pivot(left) + middle + random_pivot(right)
-
-
-# !그냥 중간 값
-def center_pivot(arr):
-    if len(arr) <= 1:
-        return arr  # 기본 케이스: 배열의 길이가 0 또는 1인 경우 배열을 그대로 반환
-    pivot = arr[len(arr) // 2]  # 피벗 선택 (여기서는 배열의 중간 요소)
-    left = [x for x in arr if x < pivot]  # 피벗보다 작은 요소들
-    middle = [x for x in arr if x == pivot]  # 피벗과 같은 요소들
-    right = [x for x in arr if x > pivot]  # 피벗보다 큰 요소들
-    # 재귀적으로 정렬하고 결합
-    return center_pivot(left) + middle + center_pivot(right)
-
-
-#!과제 엑셀 파일로 테스트
-# file_path = '정렬/input_quick_sort.xlsx'
-# data = pd.read_excel(file_path)
-# arr = data.iloc[:, 0].tolist()
-
-#!랜덤한 배열로 테스트
-arr = [random.randint(0, 9999) for _ in range(100000)]
-
-print(f'배열 크기 : {len(arr)}')
-repeat_time = 2
-print(f"시간 측정 : {repeat_time}회 반복 평균")
-
-# !퀵 정렬(center pivot)의 실행 시간 측정
-center_pivot_time = timeit.timeit(
-    "center_pivot(arr.copy())", globals=globals(), number=repeat_time)
-print(f"center_pivot: {center_pivot_time:.3f} seconds")
-
-# !퀵 정렬(median of three pivot)의 실행 시간 측정
-median_of_three_pivot_time = timeit.timeit(
-    "median_of_three_pivot(arr.copy())", globals=globals(), number=repeat_time)
-print(
-    f"median_of_three_pivot: {median_of_three_pivot_time:.3f} seconds")
-
-# !퀵 정렬(median of medians pivot)의 실행 시간 측정
-median_of_medians_pivot_time = timeit.timeit(
-    "median_of_medians_pivot(arr.copy())", globals=globals(), number=repeat_time)
-print(
-    f"median_of_medians_pivot: {median_of_medians_pivot_time:.3f} seconds")
-
-# !퀵 정렬(random pivot)의 실행 시간 측정
-random_pivot_time = timeit.timeit(
-    "random_pivot(arr.copy())", globals=globals(), number=repeat_time)
-print(
-    f"random_pivot: {random_pivot_time:.3f} seconds")
-
-# !퀵 정렬(Hoare Partition Scheme Center Pivot)의 실행 시간 측정
-hoare_partition_time = timeit.timeit(
-    "hoare_partition(arr.copy(), 0, len(arr.copy()) - 1)", globals=globals(), number=repeat_time)
-print(
-    f"hoare_partition(center_pivot): {hoare_partition_time:.3f} seconds")
-
+repeat_time = 1
 arr_size = len(arr)
-sorted_arr1 = center_pivot(arr.copy())
-sorted_arr2 = median_of_three_pivot(arr.copy())
-sorted_arr3 = median_of_medians_pivot(arr.copy())
-sorted_arr4 = random_pivot(arr.copy())
-sorted_arr5 = hoare_partition(arr.copy(), 0, len(arr.copy()) - 1)
-
-
-def are_arrays_equal(*arrays):
-    return all(all(a == b for b in arrays) for a in arrays)
-
-
-is_equal = are_arrays_equal(
-    sorted_arr1, sorted_arr2, sorted_arr3, sorted_arr4, sorted_arr5)
-print("모두 같은가? : ", is_equal)
-
-# print(sorted_arr1)
-# print(sorted_arr2)
-# print(sorted_arr3)
-# print(sorted_arr4)
-# print(sorted_arr5)
-# print("Sorted array is:", sorted_arr1)
+sorted_arrays = {}
+result = sorted(arr.copy())
+print(f'배열 크기 : {arr_size}')
+print(f"시간 측정 : {repeat_time}회 반복")
+time = timeit.timeit("sorted(arr.copy())",
+                     globals=globals(), number=repeat_time)
+print(f"python C sorted() Tim   :        {time:.3f} seconds")
+for method, name in methods.items():
+    time = timeit.timeit(f"hoare_partition(arr.copy(), 0, arr_size - 1, {method})",
+                         globals=globals(), number=repeat_time)
+    sorted_array = hoare_partition(arr.copy(), 0, arr_size - 1, method)
+    sorted_arrays[method] = sorted_array
+    print(f'{name}: {"Equal" if (result == sorted_array) else "Unequal"}, {time:.3f} seconds')
