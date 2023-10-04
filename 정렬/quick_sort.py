@@ -1,5 +1,5 @@
 """
-@author: 김민규(1924385)
+@author: 김민규(1924385) - Dong-A University
 @date: 2023-09-23~26
 @todo: quick sorting methods for Hoare's Partition Algorithm with different pivot choices
 """
@@ -20,35 +20,34 @@ def hoare_partition(arr, left, right, method):
     return arr
 
 
-# !median_of ? 피봇 구하는 방법
+# !median of three  피봇 구하는 방법
 def median_of_three_pivot(arr, left, right):
     n = right - left + 1
     if n == 1:
         return left
     elif n == 2:
-        return left if arr[left] < arr[right] else right
+        return left if (arr[left] < arr[right]) else right
     center = (left + right) // 2
-    candidates = [(arr[left], left), (arr[center], center),
+    candidates = [(arr[left], left),
+                  (arr[center], center),
                   (arr[right], right)]
     candidates.sort()
     _, pivot_index = candidates[1]
     return pivot_index
 
 
-def median_of_medians_pivot(arr, low, high):
-    sub_arr = arr[low:high+1]
+# !median of medians 피봇 구하는 방법
+def median_of_medians_pivot(arr, left, right):
+    sub_arr = arr[left:right+1]
     n = len(sub_arr)
     if n <= 3:
-        sublists = [sub_arr]
+        return median_of_three_pivot(sub_arr, 0, n-1) + left
     else:
         step = n // 3
-        sublists = [sub_arr[:step], sub_arr[step:2*step], sub_arr[2*step:]]
-    medians = [sorted(sublist)[len(sublist)//2] for sublist in sublists]
-    if len(medians) <= 3:
-        pivot = sorted(medians)[len(medians)//2]
-    else:
-        pivot = median_of_medians_pivot(medians, 0, len(medians) - 1)
-    return low + sub_arr.index(pivot)
+        medians = [median_of_three_pivot(sub_arr, 0, step-1),
+                   median_of_three_pivot(sub_arr, step, 2*step-1),
+                   median_of_three_pivot(sub_arr, 2*step, n-1)]
+    return sorted(medians)[len(medians)//2] + left
 
 
 # !옮기는 과정
@@ -84,16 +83,16 @@ def hoare_partition_process(arr, left, right, method):
 
 
 # !과제 엑셀 파일로 테스트
-file_path = '정렬/input_quick_sort.xlsx'
+file_path = 'input_quick_sort.xlsx'
 data = pd.read_excel(file_path, header=None)
 arr = data.iloc[:, 0].tolist()
 # !랜덤 배열로 테스트
-arr = [random.randint(0, 100) for _ in range(100000)]
+# arr = [random.randint(0, 10000) for _ in range(1000000)]
 # print(arr)
 
 
 # !퀵 정렬(Hoare Partition Scheme)의 실행 시간 측정
-# !Center Pivot -> Median of Three Pivot -> Median of Medians Pivot -> Random Pivot 순서
+# !Center Pivot -> Random Pivot -> Median of Three Pivot -> Median of Medians Pivot 순서
 methods = {
     0: 'Center Pivot            ',
     1: 'Random Pivot            ',
@@ -103,16 +102,13 @@ methods = {
 
 repeat_time = 1
 arr_size = len(arr)
-sorted_arrays = {}
 result = sorted(arr.copy())
-print(f'배열 크기 : {arr_size}')
-print(f"시간 측정 : {repeat_time}회 반복")
+print(f'배열 크기 : {arr_size}\n시간 측정 : {repeat_time}회 반복')
 time = timeit.timeit("sorted(arr.copy())",
                      globals=globals(), number=repeat_time)
-print(f"python C sorted() Tim   :        {time:.3f} seconds")
+# print(f"python C sorted() Tim   :        {time:.3f} seconds")
 for method, name in methods.items():
     time = timeit.timeit(f"hoare_partition(arr.copy(), 0, arr_size - 1, {method})",
                          globals=globals(), number=repeat_time)
     sorted_array = hoare_partition(arr.copy(), 0, arr_size - 1, method)
-    sorted_arrays[method] = sorted_array
-    print(f'{name}: {"Equal" if (result == sorted_array) else "Unequal"}, {time:.3f} seconds')
+    print(f'{name}: {"Equal" if (result == sorted_array) else "Unequal"}, {time:.4f} seconds')
