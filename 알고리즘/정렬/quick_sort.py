@@ -59,7 +59,7 @@ def hoare_partition_process(arr, left, right, method):
         pivot_index = random.randint(left, right)
     elif method == 2:
         pivot_index = median_of_three_pivot(arr, left, right)
-    elif method == 3:
+    else:
         pivot_index = median_of_medians_pivot(arr, left, right)
     pivot = arr[pivot_index]
 
@@ -83,7 +83,7 @@ def hoare_partition_process(arr, left, right, method):
 
 
 # !과제 엑셀 파일로 테스트
-file_path = 'input_quick_sort.xlsx'
+file_path = '정렬/input_quick_sort.xlsx'
 data = pd.read_excel(file_path, header=None)
 arr = data.iloc[:, 0].tolist()
 # !랜덤 배열로 테스트

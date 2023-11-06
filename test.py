@@ -4,6 +4,7 @@ def quick_sort(arr, low, high):
         quick_sort(arr, low, pivot_index)
         quick_sort(arr, pivot_index + 1, high)
 
+
 def partition(arr, low, high):
     pivot = arr[low]
     left = low + 1
@@ -12,14 +13,15 @@ def partition(arr, low, high):
     while not done:
         while left <= right and arr[left] <= pivot:
             left = left + 1
-        while arr[right] >= pivot and right >=left:
-            right = right -1
+        while arr[right] >= pivot and right >= left:
+            right = right - 1
         if right < left:
-            done= True
+            done = True
         else:
             arr[left], arr[right] = arr[right], arr[left]
     arr[low], arr[right] = arr[right], arr[low]
     return right
+
 
 # 예시 배열
 arr = [3, 6, 8, 10, 1, 2, 1]

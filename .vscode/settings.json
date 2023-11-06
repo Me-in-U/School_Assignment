@@ -1,8 +1,10 @@
 {
   "java.jdt.ls.vmargs": "-XX:+UseParallelGC -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90 -Dsun.zip.disableMemoryMapping=true -Xmx2G -Xms100m -Xlog:jni+resolve=off -javaagent:\"c:\\Users\\jun30\\.vscode\\extensions\\vscjava.vscode-lombok-1.0.1\\server\\lombok.jar\"",
   "[python]": {
-    "editor.defaultFormatter": "ms-python.autopep8"
+    "editor.defaultFormatter": "ms-python.autopep8",
+    "editor.formatOnSave": true
   },
-  "python.formatting.provider": "none",
-  "cSpell.words": ["hoare", "setrecursionlimit", "sublists"]
+  "cSpell.words": ["hoare", "kruskal", "setrecursionlimit", "sublists"],
+  "python.analysis.typeCheckingMode": "basic",
+  "python.analysis.autoImportCompletions": true
 }

@@ -28,7 +28,6 @@ def kruskal(graph):
 
     # 1. 가중치의 오름차순으로 간선들을 정렬: L = 정렬된 간선 리스트
     L = sorted(graph, key=lambda x: x[2])
-    print(L)
     # 2. T=Φ // 트리 T를 초기화
     T = []
 
