@@ -4,7 +4,13 @@
     "editor.defaultFormatter": "ms-python.autopep8",
     "editor.formatOnSave": true
   },
-  "cSpell.words": ["hoare", "kruskal", "setrecursionlimit", "sublists"],
+  "cSpell.words": [
+    "hoare",
+    "kruskal",
+    "optim",
+    "setrecursionlimit",
+    "sublists"
+  ],
   "python.analysis.typeCheckingMode": "basic",
   "python.analysis.autoImportCompletions": true
 }
