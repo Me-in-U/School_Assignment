@@ -9,6 +9,7 @@
     "hoare",
     "kmeans",
     "kruskal",
+    "nplus",
     "optim",
     "setrecursionlimit",
     "sublists"
