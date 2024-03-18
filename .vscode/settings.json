@@ -12,7 +12,8 @@
     "nplus",
     "optim",
     "setrecursionlimit",
-    "sublists"
+    "sublists",
+    "unables"
   ],
   "python.analysis.typeCheckingMode": "basic",
   "python.analysis.autoImportCompletions": true

@@ -6,7 +6,7 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 
-public class Main {
+public class nplus1 {
     private static final int MAX = 1000000;
     private static int[] cycleLength = new int[MAX + 1];
 
