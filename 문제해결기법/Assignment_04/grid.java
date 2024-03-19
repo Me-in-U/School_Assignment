@@ -28,7 +28,7 @@ public class grid {
 
     public static void main(String[] args) throws IOException {
         BufferedOutputStream bs = new BufferedOutputStream(new FileOutputStream("grid.out"));
-        BufferedReader br = new BufferedReader(new FileReader("문제해결기법\\Assignment_04\\0.inp"));
+        BufferedReader br = new BufferedReader(new FileReader("문제해결기법\\Assignment_04\\2.inp"));
         StringTokenizer st = null;
         StringBuilder sb = new StringBuilder();
         int T = Integer.parseInt(br.readLine());
@@ -85,39 +85,62 @@ public class grid {
 
             // !맨 윗 첫 줄
             for (int j = 1; j <= y; j++) {
-                boolean nextIsDot = dots[0][j];
-                if (nextIsDot)
-                    for (int dot = 1; dot <= 10; dot++)
-                        routeCount[0][j][dot] = routeCount[0][j - 1][dot - 1];
-                else if (!unables[0][j])
-                    for (int dot = 0; dot <= 10; dot++) {
-                        routeCount[0][j][dot] = routeCount[0][j - 1][dot];
+                if (!unables[0][j]) {
+                    boolean nextIsDot = dots[0][j];
+                    if (nextIsDot) {
+                        for (int dot = 1; dot <= 10; dot++) {
+                            int nextDotCount = dot + 1;
+                            if (nextDotCount > 10) {
+                                nextDotCount = 10;
+                            }
+                            routeCount[0][j][nextDotCount] = routeCount[0][j - 1][dot - 1] % MOD;
+                        }
+                    } else {
+                        for (int dot = 0; dot <= 10; dot++) {
+                            routeCount[0][j][dot] = routeCount[0][j - 1][dot] % MOD;
+                        }
                     }
+                }
             }
             // !맨 왼쪽 첫 줄
             for (int j = 1; j <= x; j++) {
-                boolean nextIsDot = dots[j][0];
-                if (nextIsDot)
-                    for (int dot = 1; dot <= 10; dot++)
-                        routeCount[j][0][dot] = routeCount[j - 1][0][dot - 1];
-                else if (!unables[j][0])
-                    for (int dot = 0; dot <= 10; dot++) {
-                        routeCount[j][0][dot] = routeCount[j - 1][0][dot];
+                if (!unables[j][0]) {
+                    boolean nextIsDot = dots[j][0];
+                    if (nextIsDot) {
+                        for (int dot = 1; dot <= 10; dot++) {
+                            int nextDotCount = dot + 1;
+                            if (nextDotCount > 10) {
+                                nextDotCount = 10;
+                            }
+                            routeCount[j][0][nextDotCount] = routeCount[j - 1][0][dot - 1] % MOD;
+                        }
+                    } else {
+                        for (int dot = 0; dot <= 10; dot++) {
+                            routeCount[j][0][dot] = routeCount[j - 1][0][dot] % MOD;
+                        }
                     }
-            }
-            // !임시 출력
-            for (int j = 0; j <= x; j++) {
-                for (int j2 = 0; j2 < y; j2++) {
-                    System.out.print(routeCount[j][j2][0]);
                 }
-                System.out.println();
             }
-
             for (int j = 1; j <= x; j++) {
                 for (int j2 = 1; j2 <= y; j2++) {
-                    for (int dot = 0; dot <= 10; dot++) {
-                        routeCount[j][j2][dot] = routeCount[j - 1][j2][dot] + routeCount[j][j2 - 1][dot];
+                    if (!unables[j][j2]) {
+                        if (dots[j][j2]) {
+                            for (int dot = 0; dot <= 10; dot++) {
+                                int nextDotCount = dot + 1;
+                                if (nextDotCount > 10) {
+                                    nextDotCount = 10;
+                                }
+                                routeCount[j][j2][nextDotCount] = (routeCount[j - 1][j2][dot]
+                                        + routeCount[j][j2 - 1][dot]) % MOD;
+                            }
+                        } else {
+                            for (int dot = 0; dot <= 10; dot++) {
+                                routeCount[j][j2][dot] = (routeCount[j - 1][j2][dot] + routeCount[j][j2 - 1][dot])
+                                        % MOD;
+                            }
+                        }
                     }
+
                 }
             }
 
