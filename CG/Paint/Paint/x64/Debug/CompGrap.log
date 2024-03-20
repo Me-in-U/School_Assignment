@@ -1,0 +1,4 @@
+﻿  square.cpp
+w3-lab.obj : error LNK2005: "void __cdecl display(void)" (?display@@YAXXZ)이(가) square.obj에 이미 정의되어 있습니다.
+w3-lab.obj : error LNK2005: main이(가) square.obj에 이미 정의되어 있습니다.
+C:\Users\LoewllZoe\Documents\GitHub\SchoolAssignment\CG\CompGrap\x64\Debug\CompGrap.exe : fatal error LNK1169: 여러 번 정의된 기호가 있습니다.
