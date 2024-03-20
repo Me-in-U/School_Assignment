@@ -24,7 +24,7 @@ public class grid {
             int b = Integer.parseInt(st.nextToken());
             int k = Integer.parseInt(st.nextToken());
 
-            int[][][] routeCount = new int[x + 1][y + 1][11];
+            int[][][] routeCount = new int[x + 1][y + 1][k + 1];
 
             boolean[][] dots = new boolean[x + 1][y + 1];
             st = new StringTokenizer(br.readLine());
@@ -39,22 +39,19 @@ public class grid {
             if (unable[0][0] || unable[x][y]) {
                 sb.append(0).append('\n');
                 continue;
-            } else {
-                routeCount[0][0][0] = 1;
             }
 
+            routeCount[0][0][0] = 1;
             for (int xx = 1; xx <= x; xx++) {
                 if (!unable[xx][0]) {
                     if (dots[xx][0]) {
-                        for (int dot = 1; dot <= 10; dot++) {
+                        for (int dot = 1; dot <= k; dot++) {
                             routeCount[xx][0][dot] = routeCount[xx - 1][0][dot - 1];
                         }
-                        routeCount[xx][0][10] = ((routeCount[xx][0][10] % MOD) + (routeCount[xx - 1][0][10] % MOD))
-                                % MOD;
+                        routeCount[xx][0][k] += routeCount[xx - 1][0][k];
                     } else {
-                        for (int dot = 0; dot <= 10; dot++) {
-                            routeCount[xx][0][dot] = routeCount[xx - 1][0][dot];
-                        }
+                        System.arraycopy(routeCount[xx - 1][0], 0,
+                                routeCount[xx][0], 0, k + 1);
                     }
                 } else {
                     break;
@@ -64,56 +61,42 @@ public class grid {
             for (int yy = 1; yy <= y; yy++) {
                 if (!unable[0][yy]) {
                     if (dots[0][yy]) {
-                        for (int dot = 1; dot <= 10; dot++) {
+                        for (int dot = 1; dot <= k; dot++) {
                             routeCount[0][yy][dot] = routeCount[0][yy - 1][dot - 1];
                         }
-                        routeCount[0][yy][10] = ((routeCount[0][yy][10] % MOD) + (routeCount[0][yy - 1][10] % MOD))
-                                % MOD;
+                        routeCount[0][yy][k] += routeCount[0][yy - 1][k];
                     } else {
-                        for (int dot = 0; dot <= 10; dot++) {
-                            routeCount[0][yy][dot] = routeCount[0][yy - 1][dot];
-                        }
+                        System.arraycopy(routeCount[0][yy - 1], 0,
+                                routeCount[0][yy], 0, k + 1);
                     }
                 } else {
                     break;
                 }
             }
+
             for (int xx = 1; xx <= x; xx++) {
                 for (int yy = 1; yy <= y; yy++) {
                     if (!unable[xx][yy]) {
                         if (dots[xx][yy]) {
-                            for (int dot = 1; dot <= 10; dot++) {
-                                routeCount[xx][yy][dot] = ((routeCount[xx - 1][yy][dot - 1] % MOD)
-                                        + (routeCount[xx][yy - 1][dot - 1] % MOD))
-                                        % MOD;
+                            for (int dot = 1; dot <= k; dot++) {
+                                routeCount[xx][yy][dot] = (routeCount[xx - 1][yy][dot - 1]
+                                        + routeCount[xx][yy - 1][dot - 1]) % MOD;
                             }
-                            routeCount[xx][yy][10] = ((routeCount[xx][yy][10] % MOD) +
-                                    ((routeCount[xx - 1][yy][10] % MOD)
-                                            + (routeCount[xx][yy - 1][10] % MOD))
-                                            % MOD)
-                                    % MOD;
+                            routeCount[xx][yy][k] = (routeCount[xx][yy][k] + (routeCount[xx - 1][yy][k]
+                                    + (routeCount[xx][yy - 1][k])) % MOD) % MOD;
+
                         } else {
-                            for (int dot = 0; dot <= 10; dot++) {
-                                routeCount[xx][yy][dot] = ((routeCount[xx - 1][yy][dot] % MOD)
-                                        + (routeCount[xx][yy - 1][dot] % MOD))
-                                        % MOD;
+                            for (int dot = 0; dot <= k; dot++) {
+                                routeCount[xx][yy][dot] = (routeCount[xx - 1][yy][dot]
+                                        + routeCount[xx][yy - 1][dot]) % MOD;
                             }
                         }
                     }
                 }
             }
-            System.out.print("(" + x + "," + y + ") ->");
-            for (int i = 0; i <= 10; i++) {
-                System.out.print(routeCount[x][y][i] + " ");
-            }
-            System.out.println();
-            int result = 0;
-            for (int kk = k; kk <= 10; kk++) {
-                result = ((result % MOD) + (routeCount[x][y][kk] % MOD)) % MOD;
-            }
-            sb.append(result).append('\n');
+            sb.append(routeCount[x][y][k]).append('\n');
         }
-        bs.write(sb.toString().getBytes());
+        bs.write(sb.toString().trim().getBytes());
         bs.close();
         br.close();
     }
