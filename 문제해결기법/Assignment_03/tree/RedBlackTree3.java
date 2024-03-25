@@ -5,7 +5,7 @@ package 문제해결기법.Assignment_03.tree;
  *
  * @author <a href="sven@happycoders.eu">Sven Woltmann</a>
  */
-public class RedBlackTree extends BaseBinaryTree implements BinarySearchTree {
+public class RedBlackTree3 extends BaseBinaryTree implements BinarySearchTree {
 
     static final boolean RED = false;
     static final boolean BLACK = true;

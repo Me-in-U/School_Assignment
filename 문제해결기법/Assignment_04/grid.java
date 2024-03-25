@@ -1,10 +1,9 @@
-package 문제해결기법.Assignment_04;
-
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+
 import java.util.StringTokenizer;
 
 public class grid {
@@ -12,7 +11,7 @@ public class grid {
 
     public static void main(String[] args) throws IOException {
         BufferedOutputStream bs = new BufferedOutputStream(new FileOutputStream("grid.out"));
-        BufferedReader br = new BufferedReader(new FileReader("문제해결기법\\Assignment_04\\2.inp"));
+        BufferedReader br = new BufferedReader(new FileReader("grid.inp"));
         StringTokenizer st = null;
         StringBuilder sb = new StringBuilder();
         int T = Integer.parseInt(br.readLine());

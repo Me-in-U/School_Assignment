@@ -13,7 +13,7 @@ public class rbt {
         BufferedReader br = new BufferedReader(new FileReader("문제해결기법\\Assignment_03\\1.inp"));
         StringBuilder sb = new StringBuilder();
 
-        RedBlackTree tree = new RedBlackTree();
+        RedBlackTree3 tree = new RedBlackTree3();
 
         while (true) {
             String[] line = br.readLine().split(" ");
