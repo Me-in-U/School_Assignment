@@ -42,10 +42,10 @@ public class rbt {
 
             if (z.left == nullLeaf) {
                 x = z.right;
-                replaceNode(y, x);
+                replaceNode(y, z.right);
             } else if (z.right == nullLeaf) {
                 x = z.left;
-                replaceNode(y, x);
+                replaceNode(y, z.left);
             } else {
                 y = minimum(z.right);
                 yOriginalColor = y.color;
