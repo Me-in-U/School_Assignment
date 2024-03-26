@@ -1,9 +1,8 @@
-package 문제해결기법.Assignment_03;
-
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.io.IOException;
 
 public class rbt {
     enum COLOR {
@@ -33,18 +32,22 @@ public class rbt {
 
         public void deleteNode(long key) {
             Node z = searchTree(key);
-            Node x;
-            Node y = z;
+            if (z == nullLeaf) {
+                return;
+            }
 
+            Node x = z;
+            Node y = z;
             COLOR yOriginalColor = y.color;
+
             if (z.left == nullLeaf) {
                 x = z.right;
-                replaceNode(z, z.right);
+                replaceNode(y, x);
             } else if (z.right == nullLeaf) {
                 x = z.left;
-                replaceNode(z, z.left);
+                replaceNode(y, x);
             } else {
-                y = successor(z);
+                y = minimum(z.right);
                 yOriginalColor = y.color;
                 x = y.right;
                 if (y.parent == z) {
@@ -64,11 +67,14 @@ public class rbt {
                 deleteFixup(x);
         }
 
-        public void deleteFixup(Node x) {
+        private void deleteFixup(Node x) {
             Node w;
             while (x != root && x.color == COLOR.BLACK) {
                 if (x == x.parent.left) {
                     w = x.parent.right;
+                    if (w == nullLeaf) {
+                        break;
+                    }
                     if (w.color == COLOR.RED) {
                         w.color = COLOR.BLACK;
                         x.parent.color = COLOR.RED;
@@ -93,13 +99,16 @@ public class rbt {
                     }
                 } else {
                     w = x.parent.left;
+                    if (w == nullLeaf) {
+                        break;
+                    }
                     if (w.color == COLOR.RED) {
                         w.color = COLOR.BLACK;
                         x.parent.color = COLOR.RED;
                         rightRotate(x.parent);
                         w = x.parent.left;
                     }
-                    if (w.right.color == COLOR.BLACK) {
+                    if (w.right.color == COLOR.BLACK && w.left.color == COLOR.BLACK) {
                         w.color = COLOR.RED;
                         x = x.parent;
                     } else {
@@ -122,7 +131,7 @@ public class rbt {
 
         public void replaceNode(Node u, Node v) {
             if (u.parent == null)
-                root = v;
+                this.root = v;
             else if (u == u.parent.left)
                 u.parent.left = v;
             else
@@ -148,7 +157,7 @@ public class rbt {
 
             node.parent = y;
             if (y == null) {
-                root = node;
+                this.root = node;
             } else if (node.data < y.data) {
                 y.left = node;
             } else {
@@ -169,7 +178,7 @@ public class rbt {
 
         public void insertFixup(Node x) {
             Node y;
-            while (x != root && x.parent.color == COLOR.RED) {
+            while (x != this.root && x.parent.color == COLOR.RED) {
                 if (x.parent == x.parent.parent.right) {
                     y = x.parent.parent.left;
                     if (y.color == COLOR.RED) {
@@ -204,16 +213,12 @@ public class rbt {
                     }
                 }
             }
-            root.color = COLOR.BLACK;
+            this.root.color = COLOR.BLACK;
         }
 
         public Node successor(Node x) {
             if (x.right != nullLeaf) {
-                Node minNode = x.right;
-                while (minNode.left != nullLeaf) {
-                    minNode = minNode.left;
-                }
-                return minNode;
+                return minimum(x.right);
             }
 
             Node y = x.parent;
@@ -222,6 +227,13 @@ public class rbt {
                 y = y.parent;
             }
             return y;
+        }
+
+        public Node minimum(Node node) {
+            while (node.left != nullLeaf) {
+                node = node.left;
+            }
+            return node;
         }
 
         public void leftRotate(Node x) {
@@ -273,59 +285,33 @@ public class rbt {
             }
             return nullLeaf;
         }
-
-        public void prettyPrint() {
-            printHelper(this.root, "", true);
-        }
-
-        private void printHelper(Node root, String indent, boolean last) {
-            // print the tree structure on the screen
-            if (root != nullLeaf) {
-                System.out.print(indent);
-                if (last) {
-                    System.out.print("R----");
-                    indent += "     ";
-                } else {
-                    System.out.print("L----");
-                    indent += "|    ";
-                }
-
-                COLOR sColor = root.color;
-                System.out.println(root.data + "(" + sColor + ")");
-                printHelper(root.left, indent, false);
-                printHelper(root.right, indent, true);
-            }
-        }
     }
 
-    public static void main(String[] args) throws Exception {
-        try {
-            BufferedWriter bw = new BufferedWriter(new FileWriter("rbt.out"));
-            BufferedReader br = new BufferedReader(new FileReader("문제해결기법\\Assignment_03\\3.inp"));
-            StringBuilder sb = new StringBuilder();
-
-            RedBlackTree bst = new RedBlackTree();
-            String line;
-            while ((line = br.readLine()) != null) {
-                String[] commandKey = line.split(" ");
-                char command = commandKey[0].charAt(0);
-                long key = Long.parseLong(commandKey[1]);
-                if (key < 0)
-                    break;
-                if (command == 'i') {
-                    bst.insert(key);
-                } else if (command == 'c') {
-                    COLOR color = bst.searchTree(key).color;
-                    sb.append("color(").append(key).append("): ").append(color)
-                            .append('\n');
-                } else if (command == 'd') {
-                    bst.deleteNode(key);
-                }
+    public static void main(String[] args) throws IOException {
+        BufferedWriter bw = new BufferedWriter(new FileWriter("rbt.out"));
+        BufferedReader br = new BufferedReader(new FileReader("rbt.inp"));
+        StringBuilder sb = new StringBuilder();
+        RedBlackTree bst = new RedBlackTree();
+        String line;
+        while ((line = br.readLine()) != null) {
+            String[] commandKey = line.split(" ");
+            char command = commandKey[0].charAt(0);
+            long key = Long.parseLong(commandKey[1]);
+            if (key < 0)
+                break;
+            if (command == 'i') {
+                bst.insert(key);
+            } else if (command == 'c') {
+                COLOR color = bst.searchTree(key).color;
+                sb.append("color(").append(key).append("): ").append(color)
+                        .append('\n');
+            } else if (command == 'd') {
+                bst.deleteNode(key);
             }
-            bst.prettyPrint();
-            bw.write(sb.toString().trim());
-            bw.flush();
-        } catch (NumberFormatException e) {
         }
+        bw.write(sb.toString().trim());
+        bw.flush();
+        bw.close();
+        br.close();
     }
 }

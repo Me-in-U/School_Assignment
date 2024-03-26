@@ -242,6 +242,11 @@ public class RedBlackTree2 {
         root.color = 0;
     }
 
+    // print the tree structure on the screen
+    public void prettyPrint() {
+        printHelper(this.root, "", true);
+    }
+
     private void printHelper(Node root, String indent, boolean last) {
         // print the tree structure on the screen
         if (root != TNULL) {
@@ -441,14 +446,9 @@ public class RedBlackTree2 {
         deleteNodeHelper(this.root, data);
     }
 
-    // print the tree structure on the screen
-    public void prettyPrint() {
-        printHelper(this.root, "", true);
-    }
-
     public static void main(String[] args) throws IOException {
         BufferedOutputStream bs = new BufferedOutputStream(new FileOutputStream("rbt.out"));
-        BufferedReader br = new BufferedReader(new FileReader("문제해결기법\\Assignment_03\\0.inp"));
+        BufferedReader br = new BufferedReader(new FileReader("문제해결기법\\Assignment_03\\3.inp"));
         StringBuilder sb = new StringBuilder();
 
         RedBlackTree2 bst = new RedBlackTree2();
@@ -466,7 +466,7 @@ public class RedBlackTree2 {
                 case 'c': // Color check operation
                     Node node = bst.searchTree(key);
                     int color = node.color;
-                    sb.append("color(").append(key).append(") : ").append(color).append('\n');
+                    sb.append("color(").append(key).append("): ").append(color).append('\n');
                     break;
                 case 'd': // Delete operation
                     bst.deleteNode(key);

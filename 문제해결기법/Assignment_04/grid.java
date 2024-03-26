@@ -93,7 +93,11 @@ public class grid {
                     }
                 }
             }
-            sb.append(routeCount[x][y][k]).append('\n');
+            if (k == 0) {
+                sb.append(routeCount[x][y][0]).append('\n');
+            } else {
+                sb.append(routeCount[x][y][k]).append('\n');
+            }
         }
         bs.write(sb.toString().trim().getBytes());
         bs.close();
