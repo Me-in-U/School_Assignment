@@ -1,4 +1,4 @@
-package 문제해결기법.Assignment_03.tree;
+package tree;
 
 /**
  * Interface for various BST implementations.

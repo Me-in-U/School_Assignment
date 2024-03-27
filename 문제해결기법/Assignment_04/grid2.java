@@ -1,4 +1,3 @@
-package 문제해결기법.Assignment_04;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;

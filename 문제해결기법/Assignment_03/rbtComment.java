@@ -1,5 +1,3 @@
-package 문제해결기법.Assignment_03;
-
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.FileOutputStream;
