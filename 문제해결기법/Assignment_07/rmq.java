@@ -52,27 +52,27 @@ public class rmq {
         build(0, N - 1, 0);
     }
 
-    private static void build(int left, int right, int node) {
-        if (left == right) {
-            tree[node] = left;
+    private static void build(int start, int end, int node) {
+        if (start == end) {
+            tree[node] = start;
         } else {
-            int mid = (left + right) / 2;
-            build(left, mid, 2 * node + 1);
-            build(mid + 1, right, 2 * node + 2);
+            int mid = (start + end) / 2;
+            build(start, mid, 2 * node + 1);
+            build(mid + 1, end, 2 * node + 2);
             tree[node] = arr[tree[2 * node + 1]] <= arr[tree[2 * node + 2]] ? tree[2 * node + 1]
                     : tree[2 * node + 2];
         }
     }
 
-    private static void update(int left, int right, int node, int idx, int val) {
-        if (left == right) {
+    private static void update(int start, int end, int node, int idx, int val) {
+        if (start == end) {
             arr[idx] = val;
         } else {
-            int mid = (left + right) / 2;
-            if (left <= idx && idx <= mid)
-                update(left, mid, 2 * node + 1, idx, val);
+            int mid = (start + end) / 2;
+            if (start <= idx && idx <= mid)
+                update(start, mid, 2 * node + 1, idx, val);
             else
-                update(mid + 1, right, 2 * node + 2, idx, val);
+                update(mid + 1, end, 2 * node + 2, idx, val);
             tree[node] = arr[tree[2 * node + 1]] <= arr[tree[2 * node + 2]] ? tree[2 * node + 1]
                     : tree[2 * node + 2];
         }
