@@ -44,9 +44,8 @@ public class grid {
             for (int xx = 1; xx <= x; xx++) {
                 if (!unable[xx][0]) {
                     if (dots[xx][0]) {
-                        for (int dot = 1; dot <= k; dot++) {
+                        for (int dot = 1; dot <= k; dot++)
                             routeCount[xx][0][dot] = routeCount[xx - 1][0][dot - 1];
-                        }
                         routeCount[xx][0][k] += routeCount[xx - 1][0][k];
                     } else {
                         System.arraycopy(routeCount[xx - 1][0], 0,
@@ -60,9 +59,8 @@ public class grid {
             for (int yy = 1; yy <= y; yy++) {
                 if (!unable[0][yy]) {
                     if (dots[0][yy]) {
-                        for (int dot = 1; dot <= k; dot++) {
+                        for (int dot = 1; dot <= k; dot++)
                             routeCount[0][yy][dot] = routeCount[0][yy - 1][dot - 1];
-                        }
                         routeCount[0][yy][k] += routeCount[0][yy - 1][k];
                     } else {
                         System.arraycopy(routeCount[0][yy - 1], 0,
@@ -77,27 +75,20 @@ public class grid {
                 for (int yy = 1; yy <= y; yy++) {
                     if (!unable[xx][yy]) {
                         if (dots[xx][yy]) {
-                            for (int dot = 1; dot <= k; dot++) {
+                            for (int dot = 1; dot <= k; dot++)
                                 routeCount[xx][yy][dot] = (routeCount[xx - 1][yy][dot - 1]
                                         + routeCount[xx][yy - 1][dot - 1]) % MOD;
-                            }
                             routeCount[xx][yy][k] = (routeCount[xx][yy][k] + (routeCount[xx - 1][yy][k]
                                     + (routeCount[xx][yy - 1][k])) % MOD) % MOD;
-
                         } else {
-                            for (int dot = 0; dot <= k; dot++) {
+                            for (int dot = 0; dot <= k; dot++)
                                 routeCount[xx][yy][dot] = (routeCount[xx - 1][yy][dot]
                                         + routeCount[xx][yy - 1][dot]) % MOD;
-                            }
                         }
                     }
                 }
             }
-            if (k == 0) {
-                sb.append(routeCount[x][y][0]).append('\n');
-            } else {
-                sb.append(routeCount[x][y][k]).append('\n');
-            }
+            sb.append(routeCount[x][y][k]).append('\n');
         }
         bs.write(sb.toString().trim().getBytes());
         bs.close();
