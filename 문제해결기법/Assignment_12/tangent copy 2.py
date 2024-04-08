@@ -208,7 +208,6 @@ polygons = parse_polygon_data(polygon_data)
 a, b = polygons
 convex_hull_a, convex_hull_b = calculate_convex_hull(
     a), calculate_convex_hull(b)
-print(a)
 
 a_is_above_b, a_is_left_of_b = determine_position(a, b)
 print("1", a_is_above_b, a_is_left_of_b)
@@ -222,18 +221,21 @@ if not a_is_above_b and not a_is_left_of_b:
     convex_hull_a, convex_hull_b = convex_hull_b, convex_hull_a
     a_is_above_b, a_is_left_of_b = determine_position(a, b)
     print("3", a_is_above_b, a_is_left_of_b)
-
-print(convex_hull_b)
+print("a : ", a)
+print("b : ", b)
+print("ch a : ", convex_hull_a)
+print("ch b : ", convex_hull_b)
 
 # Find the upper and lower tangents
 upper_tangent = findTangent(
     convex_hull_a, convex_hull_b, lower=False, a_is_above_b=a_is_above_b)
 lower_tangent = findTangent(
     convex_hull_a, convex_hull_b, lower=True, a_is_above_b=a_is_above_b)
-
+print("upper : ", upper_tangent)
+print("lower : ", lower_tangent)
 merged_polygon = merge_polygons_with_tangents(
     a, b, upper_tangent, lower_tangent)
-
+print("merged_polygon: ", merged_polygon)
 print(polygon_area(merged_polygon) - polygon_area(a) - polygon_area(b))
 
 
