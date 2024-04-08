@@ -38,8 +38,8 @@ def orientation(a, b, c):
     return 1 if res > 0 else -1
 
 
-def findInitialPoints(a, b, vertical=False):
-    if vertical:
+def findInitialPoints(a, b, a_is_above_b=False):
+    if a_is_above_b:
         ia = max(range(len(a)), key=lambda i: a[i][1])
         ib = min(range(len(b)), key=lambda i: b[i][1])
     else:
@@ -48,9 +48,9 @@ def findInitialPoints(a, b, vertical=False):
     return ia, ib
 
 
-def findTangent(a, b, lower=False, vertical=False):
+def findTangent(a, b, lower=False, a_is_above_b=False):
     n1, n2 = len(a), len(b)
-    ia, ib = findInitialPoints(a, b, vertical)
+    ia, ib = findInitialPoints(a, b, a_is_above_b)
 
     inda, indb = ia, ib
     done = False
@@ -127,29 +127,30 @@ def plot_polygons_and_tangents(a, b, upper_tangent, lower_tangent, convex_hull_a
 
 def merge_polygons_with_tangents(a, b, upper_tangent, lower_tangent):
     # Find the start and end indices for the tangents on each polygon
-    ua_idx = a.index(upper_tangent[0])  # Upper tangent index on A
-    ub_idx = b.index(upper_tangent[1])  # Upper tangent index on B
-    la_idx = a.index(lower_tangent[0])  # Lower tangent index on A
-    lb_idx = b.index(lower_tangent[1])  # Lower tangent index on B
+    upper_a_idx = a.index(upper_tangent[0])  # Upper tangent index on A
+    upper_idx = b.index(upper_tangent[1])  # Upper tangent index on B
+
+    lower_a_idx = a.index(lower_tangent[0])  # Lower tangent index on A
+    lower_b_idx = b.index(lower_tangent[1])  # Lower tangent index on B
 
     # Initialize the merged polygon
     merged_polygon = []
 
     # Add points from polygon A between upper and lower tangents
-    current_idx = ua_idx
+    current_idx = upper_a_idx
     while True:
         merged_polygon.append(a[current_idx])
-        if current_idx == la_idx:
+        if current_idx == lower_a_idx:
             break
-        current_idx = (current_idx - 1) % len(a)
+        current_idx = (current_idx + 1) % len(a)
 
     # Add points from polygon B between lower and upper tangents
-    current_idx = lb_idx
+    current_idx = lower_b_idx
     while True:
         merged_polygon.append(b[current_idx])
-        if current_idx == ub_idx:
+        if current_idx == upper_idx:
             break
-        current_idx = (current_idx - 1) % len(b)
+        current_idx = (current_idx + 1) % len(b)
 
     # Return to the starting point to close the polygon
     merged_polygon.append(upper_tangent[0])
@@ -163,10 +164,10 @@ def determine_position(a, b):
     centroid_b = [sum(x) / len(b) for x in zip(*b)]
 
     # Determine vertical and horizontal positioning
-    vertical = centroid_a[1] > centroid_b[1]
-    left_of_b = centroid_a[0] < centroid_b[0]
+    a_is_above_b = centroid_a[1] > centroid_b[1]
+    a_is_left_of_b = centroid_a[0] < centroid_b[0]
 
-    return vertical, left_of_b
+    return a_is_above_b, a_is_left_of_b
 
 
 def polygon_area(points):
@@ -182,43 +183,86 @@ def polygon_area(points):
 
 # Main code
 polygon_data = """
-4
-1246 1246
--1246 1246
--1246 -1246
-1246 -1246
-3
-1869 0
-4362 0
-1869 249
+32
+435 29746
+2118 19118
+4784 19540
+5194 16950
+94 16142
+-1170 24134
+-6554 23282
+-7382 28508
+-20480 26433
+-18797 15806
+-5699 17880
+-6124 20562
+-3523 20974
+-2688 15701
+-18386 13215
+-15897 -2497
+-5309 -820
+-6961 9609
+-14849 8359
+-15280 11080
+-4883 12726
+-2800 -423
+13044 2086
+11392 12516
+931 10859
+2162 3088
+-620 2647
+-2282 13138
+8251 14807
+7434 19960
+10145 20390
+8461 31017
+16
+-5006 -6182
+-3798 -8362
+-8164 -10782
+-7001 -12880
+-9199 -14099
+-11570 -9822
+-18130 -13457
+-13283 -22203
+-6723 -18567
+-7909 -16426
+-3474 -13969
+-4764 -11640
+-2635 -10460
+-158 -14927
+13078 -7591
+8229 1154
 """
 
 polygons = parse_polygon_data(polygon_data)
 a, b = polygons
+convex_hull_a, convex_hull_b = calculate_convex_hull(
+    a), calculate_convex_hull(b)
 
-# Main code to determine the position and decide if we need to swap polygons
-vertical, left_of_b = determine_position(a, b)
-print(vertical, left_of_b)
-# Swap polygons if necessary to ensure 'a' is left of 'b' or 'a' is below 'b'
-if not left_of_b:
+a_is_above_b, a_is_left_of_b = determine_position(a, b)
+if not a_is_above_b:
     a, b = b, a
+    convex_hull_a, convex_hull_b = convex_hull_b, convex_hull_a
+print(a_is_above_b, a_is_left_of_b)
 
-convex_hull_a = calculate_convex_hull(a)
-convex_hull_b = calculate_convex_hull(b)
+a_is_above_b, a_is_left_of_b = determine_position(a, b)
+print(a_is_above_b, a_is_left_of_b)
+if not a_is_left_of_b:
+    a, b = b, a
+    convex_hull_a, convex_hull_b = convex_hull_b, convex_hull_a
+
 
 # Find the upper and lower tangents
 upper_tangent = findTangent(
-    convex_hull_a, convex_hull_b, lower=False, vertical=vertical)
+    convex_hull_a, convex_hull_b, lower=False, a_is_above_b=a_is_above_b)
 lower_tangent = findTangent(
-    convex_hull_a, convex_hull_b, lower=True, vertical=vertical)
-
-# if vertical:
-#     upper_tangent, lower_tangent = lower_tangent, upper_tangent
+    convex_hull_a, convex_hull_b, lower=True, a_is_above_b=a_is_above_b)
 
 merged_polygon = merge_polygons_with_tangents(
     a, b, upper_tangent, lower_tangent)
 
-print(polygon_area(merged_polygon))
+print(polygon_area(merged_polygon) - polygon_area(a) - polygon_area(b))
 
 
 plot_polygons_and_tangents(
