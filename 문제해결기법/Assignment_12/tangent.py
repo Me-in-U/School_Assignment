@@ -12,7 +12,8 @@ def calculate_convex_hull(points):
 
 
 # 새로운 입력 데이터
-new_data = """4
+new_data = """
+4
 1246 1246
 -1246 1246
 -1246 -1246

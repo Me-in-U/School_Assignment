@@ -1,5 +1,5 @@
 from functools import cmp_to_key
-from turtle import color
+from turtle import color, width
 import matplotlib.pyplot as plt
 from scipy.spatial import ConvexHull
 
@@ -51,7 +51,6 @@ def findInitialPoints(a, b, a_is_above_b=False):
 def findTangent(a, b, lower=False, a_is_above_b=False):
     n1, n2 = len(a), len(b)
     init_a, init_b = findInitialPoints(a, b, a_is_above_b)
-    print(init_a, init_b)
 
     index_a, index_b = init_a, init_b
     done = False
@@ -116,14 +115,14 @@ def plot_polygons_and_tangents(a, b, upper_tangent, lower_tangent, convex_hull_a
 
     plt.plot([upper_tangent[0][0], upper_tangent[1][0]], [
         upper_tangent[0][1], upper_tangent[1][1]], color='green',
-        linestyle='--', label='Upper Tangent')
+        linestyle='-', label='Upper Tangent')
     plt.plot([lower_tangent[0][0], lower_tangent[1][0]], [
              lower_tangent[0][1], lower_tangent[1][1]], color='green',
-             linestyle='--', label='Lower Tangent')
+             linestyle=':', label='Lower Tangent')
 
     x, y = zip(*merged_polygon)
-    plt.plot(x + (x[0],), y + (y[0],), color='black',
-             linestyle='--', label='Merged Polygon')
+    plt.plot(x + x[:1], y + y[:1], color='black',
+             linestyle='-.', label='Merged Polygon')
     plt.fill(x, y, color='grey', label='Merged Polygon', alpha=0.5)
     # plt.scatter(x, y, c='black')
 
@@ -190,56 +189,19 @@ def polygon_area(points):
 
 # Main code
 polygon_data = """
-16
--5006 -6182
--3798 -8362
--8164 -10782
--7001 -12880
--9199 -14099
--11570 -9822
--18130 -13457
--13283 -22203
--6723 -18567
--7909 -16426
--3474 -13969
--4764 -11640
--2635 -10460
--158 -14927
-13078 -7591
-8229 1154
-32
-435 29746
-2118 19118
-4784 19540
-5194 16950
-94 16142
--1170 24134
--6554 23282
--7382 28508
--20480 26433
--18797 15806
--5699 17880
--6124 20562
--3523 20974
--2688 15701
--18386 13215
--15897 -2497
--5309 -820
--6961 9609
--14849 8359
--15280 11080
--4883 12726
--2800 -423
-13044 2086
-11392 12516
-931 10859
-2162 3088
--620 2647
--2282 13138
-8251 14807
-7434 19960
-10145 20390
-8461 31017
+6	
+12 12
+12 23
+5 7
+6 8
+10 -3
+22 5
+5	
+26 10
+29 -4
+28 16
+32 25
+25 20
 """
 
 polygons = parse_polygon_data(polygon_data)
