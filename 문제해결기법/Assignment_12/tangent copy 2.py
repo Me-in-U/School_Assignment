@@ -40,8 +40,8 @@ def orientation(a, b, c):
 
 def findInitialPoints(a, b, a_is_above_b=False):
     if a_is_above_b:
-        ia = max(range(len(a)), key=lambda i: a[i][1])
-        ib = min(range(len(b)), key=lambda i: b[i][1])
+        ia = min(range(len(a)), key=lambda i: a[i][1])
+        ib = max(range(len(b)), key=lambda i: b[i][1])
     else:
         ia = max(range(len(a)), key=lambda i: a[i][0])
         ib = min(range(len(b)), key=lambda i: b[i][0])
@@ -50,35 +50,38 @@ def findInitialPoints(a, b, a_is_above_b=False):
 
 def findTangent(a, b, lower=False, a_is_above_b=False):
     n1, n2 = len(a), len(b)
-    ia, ib = findInitialPoints(a, b, a_is_above_b)
+    init_a, init_b = findInitialPoints(a, b, a_is_above_b)
+    print(init_a, init_b)
 
-    inda, indb = ia, ib
+    index_a, index_b = init_a, init_b
     done = False
     while not done:
         done = True
 
         # Adjust for A's tangent point
         while True:
-            next_inda = (inda - 1 + n1) % n1 if lower else (inda + 1) % n1
-            ori = orientation(b[indb], a[inda], a[next_inda])
+            next_inda = (
+                index_a - 1 + n1) % n1 if lower else (index_a + 1) % n1
+            ori = orientation(b[index_b], a[index_a], a[next_inda])
             if ori == 0:  # Collinear
                 # Break immediately if next point is not closer, no need to check distance
                 break
             elif (ori < 0 if lower else ori > 0):
-                inda = next_inda
+                index_a = next_inda
                 done = False
             else:
                 break
 
         # Adjust for B's tangent point
         while True:
-            next_indb = (indb + 1) % n2 if lower else (indb - 1 + n2) % n2
-            ori = orientation(a[inda], b[indb], b[next_indb])
+            next_indb = (
+                index_b + 1) % n2 if lower else (index_b - 1 + n2) % n2
+            ori = orientation(a[index_a], b[index_b], b[next_indb])
             if ori == 0:  # Collinear
                 # Break immediately if next point is not closer, no need to check distance
                 break
             elif (ori > 0 if lower else ori < 0):
-                indb = next_indb
+                index_b = next_indb
                 done = False
             else:
                 break
@@ -87,7 +90,7 @@ def findTangent(a, b, lower=False, a_is_above_b=False):
         if done:
             break
 
-    return a[inda], b[indb]
+    return a[index_a], b[index_b]
 
 
 # Plotting function
@@ -96,9 +99,11 @@ def plot_polygons_and_tangents(a, b, upper_tangent, lower_tangent, convex_hull_a
     a_x, a_y = zip(*a)
     b_x, b_y = zip(*b)
 
-    plt.plot(a_x + a_x[:1], a_y + a_y[:1], 'b-', label='Polygon A')
+    plt.plot(a_x + a_x[:1], a_y + a_y[:1], color='blue',
+             linestyle='-', label='Polygon A')
     plt.fill(a_x, a_y, color='red', label='Polygon A', alpha=0.5)
-    plt.plot(b_x + b_x[:1], b_y + b_y[:1], 'b-', label='Polygon B')
+    plt.plot(b_x + b_x[:1], b_y + b_y[:1],  color='blue',
+             linestyle='-', label='Polygon B')
     plt.fill(b_x, b_y, color='orange', label='Polygon B', alpha=0.5)
 
     plt.plot(*zip(*convex_hull_a, convex_hull_a[0]), marker='o',
@@ -110,13 +115,15 @@ def plot_polygons_and_tangents(a, b, upper_tangent, lower_tangent, convex_hull_a
     plt.scatter(*zip(*b), c='blue')
 
     plt.plot([upper_tangent[0][0], upper_tangent[1][0]], [
-        upper_tangent[0][1], upper_tangent[1][1]], 'g--', label='Upper Tangent')
+        upper_tangent[0][1], upper_tangent[1][1]], color='green',
+        linestyle='--', label='Upper Tangent')
     plt.plot([lower_tangent[0][0], lower_tangent[1][0]], [
-             lower_tangent[0][1], lower_tangent[1][1]], 'g--', label='Lower Tangent')
+             lower_tangent[0][1], lower_tangent[1][1]], color='green',
+             linestyle='--', label='Lower Tangent')
 
     x, y = zip(*merged_polygon)
-    plt.plot(x + (x[0],), y + (y[0],), 'r-',
-             color='black', label='Merged Polygon')
+    plt.plot(x + (x[0],), y + (y[0],), color='black',
+             linestyle='--', label='Merged Polygon')
     plt.fill(x, y, color='grey', label='Merged Polygon', alpha=0.5)
     # plt.scatter(x, y, c='black')
 
@@ -183,6 +190,23 @@ def polygon_area(points):
 
 # Main code
 polygon_data = """
+16
+-5006 -6182
+-3798 -8362
+-8164 -10782
+-7001 -12880
+-9199 -14099
+-11570 -9822
+-18130 -13457
+-13283 -22203
+-6723 -18567
+-7909 -16426
+-3474 -13969
+-4764 -11640
+-2635 -10460
+-158 -14927
+13078 -7591
+8229 1154
 32
 435 29746
 2118 19118
@@ -216,23 +240,6 @@ polygon_data = """
 7434 19960
 10145 20390
 8461 31017
-16
--5006 -6182
--3798 -8362
--8164 -10782
--7001 -12880
--9199 -14099
--11570 -9822
--18130 -13457
--13283 -22203
--6723 -18567
--7909 -16426
--3474 -13969
--4764 -11640
--2635 -10460
--158 -14927
-13078 -7591
-8229 1154
 """
 
 polygons = parse_polygon_data(polygon_data)
@@ -240,18 +247,19 @@ a, b = polygons
 convex_hull_a, convex_hull_b = calculate_convex_hull(
     a), calculate_convex_hull(b)
 
+
 a_is_above_b, a_is_left_of_b = determine_position(a, b)
+print("1", a_is_above_b, a_is_left_of_b)
 if not a_is_above_b:
     a, b = b, a
     convex_hull_a, convex_hull_b = convex_hull_b, convex_hull_a
-print(a_is_above_b, a_is_left_of_b)
-
-a_is_above_b, a_is_left_of_b = determine_position(a, b)
-print(a_is_above_b, a_is_left_of_b)
-if not a_is_left_of_b:
+    a_is_above_b, a_is_left_of_b = determine_position(a, b)
+    print("2", a_is_above_b, a_is_left_of_b)
+if not a_is_above_b and not a_is_left_of_b:
     a, b = b, a
     convex_hull_a, convex_hull_b = convex_hull_b, convex_hull_a
-
+    a_is_above_b, a_is_left_of_b = determine_position(a, b)
+    print("3", a_is_above_b, a_is_left_of_b)
 
 # Find the upper and lower tangents
 upper_tangent = findTangent(

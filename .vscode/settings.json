@@ -13,6 +13,7 @@
     "inorder",
     "kmeans",
     "kruskal",
+    "linestyle",
     "nplus",
     "optim",
     "setrecursionlimit",
