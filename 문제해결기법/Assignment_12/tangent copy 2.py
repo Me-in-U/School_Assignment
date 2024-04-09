@@ -208,7 +208,7 @@ polygons = parse_polygon_data(polygon_data)
 a, b = polygons
 convex_hull_a, convex_hull_b = calculate_convex_hull(
     a), calculate_convex_hull(b)
-
+print(a)
 
 a_is_above_b, a_is_left_of_b = determine_position(a, b)
 print("1", a_is_above_b, a_is_left_of_b)
@@ -222,6 +222,8 @@ if not a_is_above_b and not a_is_left_of_b:
     convex_hull_a, convex_hull_b = convex_hull_b, convex_hull_a
     a_is_above_b, a_is_left_of_b = determine_position(a, b)
     print("3", a_is_above_b, a_is_left_of_b)
+
+print(convex_hull_b)
 
 # Find the upper and lower tangents
 upper_tangent = findTangent(

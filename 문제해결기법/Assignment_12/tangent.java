@@ -196,22 +196,18 @@ public class tangent {
     }
 
     public static Point[] findTangent(boolean lower) {
-        int[] init = findInitialPoints();
+        int[] init = findInitialPoints(); // Ensure this method exists and returns the initial points indices for the
+                                          // tangents
         int index_a = init[0];
         int index_b = init[1];
         boolean done = false;
         while (!done) {
             done = true;
             while (true) {
-                int next_index_A = lower ? index_a + 1 : index_a - 1;
-                if (next_index_A < 0) {
-                    next_index_A = polygon1HullCount - 1;
-                }
-                if (polygon1HullCount <= next_index_A) {
-                    next_index_A = 0;
-                }
+                int next_index_A = (index_a + (lower ? -1 : 1) + polygon1Hull.length) % polygon1Hull.length;
                 int ori = Point.ccw(polygon2Hull[index_b], polygon1Hull[index_a], polygon1Hull[next_index_A]);
                 if (ori == 0) {
+                    // Collinear
                     break;
                 } else if ((lower && (ori < 0)) || (!lower && (ori > 0))) {
                     index_a = next_index_A;
@@ -221,15 +217,10 @@ public class tangent {
                 }
             }
             while (true) {
-                int next_index_B = lower ? index_b + 1 : index_b - 1;
-                if (next_index_B < 0) {
-                    next_index_B = polygon2HullCount - 1;
-                }
-                if (polygon1HullCount <= next_index_B) {
-                    next_index_B = 0;
-                }
+                int next_index_B = (index_b + (lower ? 1 : -1) + polygon2Hull.length) % polygon2Hull.length;
                 int ori = Point.ccw(polygon1Hull[index_a], polygon2Hull[index_b], polygon2Hull[next_index_B]);
                 if (ori == 0) {
+                    // Collinear
                     break;
                 } else if ((lower && (ori > 0)) || (!lower && (ori < 0))) {
                     index_b = next_index_B;
@@ -246,7 +237,6 @@ public class tangent {
     }
 
     public static void mergePolygonsWithTangents() {
-        // Find the start and end indices for the tangents on each polygon
         int upperAIdx = findIndex(polygon1, upperTangent[0]); // Upper tangent index on A
         int upperBIdx = findIndex(polygon2, upperTangent[1]); // Upper tangent index on B
 
@@ -257,40 +247,36 @@ public class tangent {
 
         // Add points from polygon A between upper and lower tangents
         int currentIdx = upperAIdx;
-        while (true) {
+        do {
             mergedPolygonList.add(polygon1[currentIdx]);
-            if (currentIdx == lowerAIdx) {
-                break;
-            }
-            currentIdx = (currentIdx + 1) % polygon1Count;
-        }
+            currentIdx = (currentIdx + 1) % polygon1.length;
+        } while (currentIdx != lowerAIdx);
+
+        // Add the lower tangent point from polygon A
+        mergedPolygonList.add(polygon1[lowerAIdx]);
 
         // Add points from polygon B between lower and upper tangents
         currentIdx = lowerBIdx;
-        while (true) {
+        do {
             mergedPolygonList.add(polygon2[currentIdx]);
-            if (currentIdx == upperBIdx) {
-                break;
-            }
-            currentIdx = (currentIdx + 1) % polygon2Count;
-        }
+            currentIdx = (currentIdx + 1) % polygon2.length;
+        } while (currentIdx != upperBIdx);
 
-        // Return to the starting point to close the polygon
-        mergedPolygonList.add(upperTangent[0]);
+        // Add the upper tangent point from polygon B to close the polygon
+        mergedPolygonList.add(polygon2[upperBIdx]);
 
         // Convert the List<Point> to Point[]
         mergedPolygon = new Point[mergedPolygonList.size()];
         mergedPolygon = mergedPolygonList.toArray(mergedPolygon);
     }
 
-    // Helper method to find the index of a point in an array
-    private static int findIndex(Point[] points, Point target) {
-        for (int i = 0; i < points.length; i++) {
-            if (points[i].equals(target)) {
+    public static int findIndex(Point[] polygon, Point target) {
+        for (int i = 0; i < polygon.length; i++) {
+            if (polygon[i].equals(target)) {
                 return i;
             }
         }
-        return -1; // Not found (should not happen if target is guaranteed to be in points)
+        return -1; // Not found
     }
 
     protected static Point[] polygon1;
@@ -336,9 +322,11 @@ public class tangent {
                 polygon2[j] = new Point(x, y);
             }
 
-            polygon1Hull = convexHull(polygon1);
+            polygon1Hull = convexHull(Arrays.copyOf(polygon1, polygon1Count));
+            // polygon1Hull = convexHull(polygon1);
             polygon1HullCount = polygon1Hull.length;
-            polygon2Hull = convexHull(polygon2);
+            polygon2Hull = convexHull(Arrays.copyOf(polygon2, polygon2Count));
+            // polygon2Hull = convexHull(polygon2);
             polygon2HullCount = polygon2Hull.length;
             System.out.println("Hull 1 : " + Arrays.toString(polygon1Hull));
             System.out.println("Hull 2 : " + Arrays.toString(polygon2Hull));
@@ -368,6 +356,10 @@ public class tangent {
             System.out.println("Tangent1 : " + lowerTangent[0] + ' ' + lowerTangent[1]);
             mergePolygonsWithTangents();
             System.out.println("merged : " + Arrays.toString(mergedPolygon));
+            System.out.println("poly1 : " + Arrays.toString(polygon1));
+            System.out.println("poly2 : " + Arrays.toString(polygon2));
+            System.out.println();
+
             sb.append(polygonArea(mergedPolygon, mergedPolygon.length) - polygonArea(polygon1, polygon1.length)
                     - polygonArea(polygon2, polygon2.length)).append('\n');
         }
@@ -415,6 +407,9 @@ public class tangent {
         Point[] hull = new Point[hullSize];
         for (int i = 0; i < hullSize; i++) {
             hull[i] = stack.pollFirst();
+        }
+        for (int i = 0; i < hull.length; i++) {
+
         }
         return hull;
     }
