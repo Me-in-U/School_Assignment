@@ -37,8 +37,8 @@ public class tangentTest {
             if (res == 0)
                 return 0;
             if (res > 0)
-                return 1;
-            return -1;
+                return 1; // 시계
+            return -1; // 반시계
         }
 
         public static void swap(Point p1, Point p2) {
@@ -84,33 +84,6 @@ public class tangentTest {
         }
     }
 
-    static Point mid = new Point();
-
-    static int quad(Point p) {
-        if (p.x >= 0 && p.y >= 0)
-            return 1;
-        if (p.x <= 0 && p.y >= 0)
-            return 2;
-        if (p.x <= 0 && p.y <= 0)
-            return 3;
-        return 4;
-    }
-
-    // Compare function for sorting
-    static class PointComparator implements Comparator<Point> {
-        public int compare(Point p1, Point p2) {
-            Point p = new Point(p1.x - mid.x, p1.y - mid.y);
-            Point q = new Point(p2.x - mid.x, p2.y - mid.y);
-
-            int one = quad(p);
-            int two = quad(q);
-
-            if (one != two)
-                return one - two;
-            return p.y * q.x - q.y * p.x;
-        }
-    }
-
     static double polygonArea(Point[] points, int N) {
         double area = 0;
         for (int i = 0, j = N - 1; i < N; j = i++) {
@@ -118,6 +91,14 @@ public class tangentTest {
         }
         area /= 2;
         return area < 0 ? -area : area;
+    }
+
+    public static Point[] deepCopyArray(Point[] original) {
+        Point[] copy = new Point[original.length];
+        for (int i = 0; i < original.length; i++) {
+            copy[i] = new Point(original[i].x, original[i].y); // 새 Point 객체 생성
+        }
+        return copy;
     }
 
     public static void determinePosition(Point[] points1, Point[] points2) {
@@ -143,21 +124,14 @@ public class tangentTest {
         int ib;
 
         if (isAAboveB == 1) {
-            System.out.println("above");
             ia = findIndexWithMinY(polygon1Hull);
             ib = findIndexWithMaxY(polygon2Hull);
         } else if (isAAboveB == 0) {
-            System.out.println("under");
             ia = findIndexWithMaxY(polygon1Hull);
             ib = findIndexWithMinY(polygon2Hull);
         } else {
-            if (isALeftB) {
-                ia = findIndexWithMaxX(polygon1Hull);
-                ib = findIndexWithMinX(polygon2Hull);
-            } else {
-                ia = findIndexWithMinX(polygon1Hull);
-                ib = findIndexWithMaxX(polygon2Hull);
-            }
+            ia = findIndexWithMaxX(polygon1Hull);
+            ib = findIndexWithMinX(polygon2Hull);
         }
 
         return new int[] { ia, ib };
@@ -214,10 +188,7 @@ public class tangentTest {
             while (true) {
                 int next_index_A = (index_a + (lower ? -1 : 1) + polygon1Hull.length) % polygon1Hull.length;
                 int ori = Point.ccw(polygon2Hull[index_b], polygon1Hull[index_a], polygon1Hull[next_index_A]);
-                if (ori == 0) {
-                    // Collinear
-                    break;
-                } else if ((lower && (ori < 0)) || (!lower && (ori > 0))) {
+                if ((lower && (ori < 0)) || (!lower && (ori > 0))) {
                     index_a = next_index_A;
                     done = false;
                 } else {
@@ -227,10 +198,7 @@ public class tangentTest {
             while (true) {
                 int next_index_B = (index_b + (lower ? 1 : -1) + polygon2Hull.length) % polygon2Hull.length;
                 int ori = Point.ccw(polygon1Hull[index_a], polygon2Hull[index_b], polygon2Hull[next_index_B]);
-                if (ori == 0) {
-                    // Collinear
-                    break;
-                } else if ((lower && (ori > 0)) || (!lower && (ori < 0))) {
+                if ((lower && (ori > 0)) || (!lower && (ori < 0))) {
                     index_b = next_index_B;
                     done = false;
                 } else {
@@ -238,7 +206,6 @@ public class tangentTest {
                 }
             }
             if (done) {
-                System.out.println("done");
                 break;
             }
         }
@@ -264,7 +231,7 @@ public class tangentTest {
             currentIndex = (currentIndex + 1) % polygon1.length;
         }
         // Add the lower tangent point from polygon A
-        mergedPolygonList.add(polygon1[lowerAIdx]);
+        // mergedPolygonList.add(polygon1[lowerAIdx]);
 
         // Add points from polygon B between lower and upper tangents
         currentIndex = lowerBIdx;
@@ -276,7 +243,7 @@ public class tangentTest {
             currentIndex = (currentIndex + 1) % polygon2.length;
         }
         // Add the upper tangent point from polygon B to close the polygon
-        mergedPolygonList.add(polygon2[upperBIdx]);
+        // mergedPolygonList.add(polygon2[upperBIdx]);
 
         // Convert the List<Point> to Point[]
         mergedPolygon = new Point[mergedPolygonList.size()];
@@ -308,7 +275,7 @@ public class tangentTest {
 
     public static void main(String[] args) throws IOException {
         BufferedWriter bw = new BufferedWriter(new FileWriter("tangent.out"));
-        BufferedReader br = new BufferedReader(new FileReader("문제해결기법/Assignment_12/test.inp"));
+        BufferedReader br = new BufferedReader(new FileReader("문제해결기법/Assignment_12/3.inp"));
         StringBuilder sb = new StringBuilder();
         StringTokenizer st = null;
         int T = Integer.parseInt(br.readLine().trim());
@@ -331,27 +298,16 @@ public class tangentTest {
                 polygon2[j] = new Point(x, y);
             }
 
+            determinePosition(polygon1, polygon2);
+            if (!isALeftB) {
+                System.out.println("LR Changed");
+                Point[] temp1 = deepCopyArray(polygon1);
+                polygon1 = polygon2;
+                polygon2 = temp1;
+                determinePosition(polygon1, polygon2);
+            }
             polygon1Hull = convexHull(polygon1);
             polygon2Hull = convexHull(polygon2);
-
-            determinePosition(polygon1, polygon2);
-            // if (!isAAboveB) {
-            // Point[] temp1 = new Point[polygon1Count];
-            // for (int k = 0; k < polygon1Count; k++) {
-            // temp1[k] = new Point(polygon1[k].x, polygon1[k].y);
-            // }
-            // polygon1 = polygon2;
-            // polygon2 = temp1;
-            // Point[] temp2 = new Point[polygon1Hull.length];
-            // for (int k = 0; k < polygon1Hull.length; k++) {
-            // temp2[k] = new Point(polygon1Hull[k].x, polygon1Hull[k].y);
-            // }
-            // polygon1Hull = polygon2Hull;
-            // polygon2Hull = temp2;
-            // determinePosition(polygon1, polygon2);
-            // polygon1Count = polygon1.length;
-            // polygon2Count = polygon2.length;
-            // }
 
             upperTangent = findTangent(false);
             lowerTangent = findTangent(true);
@@ -365,26 +321,23 @@ public class tangentTest {
             System.out.println("Hull 2 : " + Arrays.toString(polygon2Hull));
             System.out.println("merged_polygon : " + Arrays.toString(mergedPolygon));
             System.out.println();
-            System.out.println("A m : " + polygonArea(mergedPolygon, mergedPolygon.length));
-            System.out.println("A a : " + polygonArea(polygon1, polygon1.length));
-            System.out.println("A b : " + polygonArea(polygon2, polygon2.length));
+            System.out.println("Area m : " + polygonArea(mergedPolygon, mergedPolygon.length));
+            System.out.println("Area a : " + polygonArea(polygon1, polygon1.length));
+            System.out.println("Area b : " + polygonArea(polygon2, polygon2.length));
             sb.append(String.format("%.1f",
                     Math.round((polygonArea(mergedPolygon, mergedPolygon.length)
                             - polygonArea(polygon1, polygon1.length)
                             - polygonArea(polygon2, polygon2.length)) * 10) / 10.0))
                     .append('\n');
-
         }
         System.out.print(sb.toString());
+        bw.write(sb.toString());
         bw.close();
         br.close();
     }
 
     public static Point[] convexHull(Point[] points) {
-        Point[] copy = new Point[points.length];
-        for (int i = 0; i < copy.length; i++) {
-            copy[i] = new Point(points[i].x, points[i].y);
-        }
+        Point[] copy = deepCopyArray(points);
         int minX = copy[0].x;
         int minY = copy[0].y;
         int minIndex = 0;
