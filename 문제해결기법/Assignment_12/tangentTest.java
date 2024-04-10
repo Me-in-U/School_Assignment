@@ -1,3 +1,5 @@
+package 문제해결기법.Assignment_12;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileReader;
@@ -11,7 +13,7 @@ import java.util.Deque;
 import java.util.List;
 import java.util.StringTokenizer;
 
-public class tangent {
+public class tangentTest {
 
     public static class Point implements Comparable<Point> {
         int x;
@@ -75,6 +77,11 @@ public class tangent {
             result = 31 * result + y;
             return result;
         }
+
+        @Override
+        public String toString() {
+            return "(" + x + ", " + y + ")";
+        }
     }
 
     static Point mid = new Point();
@@ -89,6 +96,7 @@ public class tangent {
         return 4;
     }
 
+    // Compare function for sorting
     static class PointComparator implements Comparator<Point> {
         public int compare(Point p1, Point p2) {
             Point p = new Point(p1.x - mid.x, p1.y - mid.y);
@@ -196,7 +204,8 @@ public class tangent {
     }
 
     public static Point[] findTangent(boolean lower) {
-        int[] init = findInitialPoints();
+        int[] init = findInitialPoints(); // Ensure this method exists and returns the initial points indices for the
+                                          // tangents
         int index_a = init[0];
         int index_b = init[1];
         boolean done = false;
@@ -229,6 +238,7 @@ public class tangent {
                 }
             }
             if (done) {
+                System.out.println("done");
                 break;
             }
         }
@@ -236,34 +246,39 @@ public class tangent {
     }
 
     public static void mergePolygonsWithTangents() {
-        int upperAIdx = findIndex(polygon1, upperTangent[0]);
-        int upperBIdx = findIndex(polygon2, upperTangent[1]);
-
-        int lowerAIdx = findIndex(polygon1, lowerTangent[0]);
-        int lowerBIdx = findIndex(polygon2, lowerTangent[1]);
-
+        int upperAIdx = findIndex(polygon1, upperTangent[0]); // Upper tangent index on A
+        int upperBIdx = findIndex(polygon2, upperTangent[1]); // Upper tangent index on B
+        System.out.println("index Upper: " + upperAIdx + " " + upperBIdx);
+        int lowerAIdx = findIndex(polygon1, lowerTangent[0]); // Lower tangent index on A
+        int lowerBIdx = findIndex(polygon2, lowerTangent[1]); // Lower tangent index on B
+        System.out.println("index Lower: " + lowerAIdx + " " + lowerBIdx);
         List<Point> mergedPolygonList = new ArrayList<>();
 
+        // Add points from polygon A between upper and lower tangents
         int currentIndex = upperAIdx;
         while (true) {
             mergedPolygonList.add(polygon1[currentIndex]);
             if (currentIndex == lowerAIdx) {
                 break;
             }
-            currentIndex = (currentIndex + 1) % polygon1Count;
+            currentIndex = (currentIndex + 1) % polygon1.length;
         }
+        // Add the lower tangent point from polygon A
         mergedPolygonList.add(polygon1[lowerAIdx]);
 
+        // Add points from polygon B between lower and upper tangents
         currentIndex = lowerBIdx;
         while (true) {
             mergedPolygonList.add(polygon2[currentIndex]);
             if (currentIndex == upperBIdx) {
                 break;
             }
-            currentIndex = (currentIndex + 1) % polygon2Count;
+            currentIndex = (currentIndex + 1) % polygon2.length;
         }
+        // Add the upper tangent point from polygon B to close the polygon
         mergedPolygonList.add(polygon2[upperBIdx]);
 
+        // Convert the List<Point> to Point[]
         mergedPolygon = new Point[mergedPolygonList.size()];
         mergedPolygon = mergedPolygonList.toArray(mergedPolygon);
     }
@@ -274,18 +289,14 @@ public class tangent {
                 return i;
             }
         }
-        return -1;
+        return -1; // Not found
     }
 
     protected static Point[] polygon1;
     protected static Point[] polygon1Hull;
-    protected static int polygon1Count;
-    protected static int polygon1HullCount;
 
     protected static Point[] polygon2;
     protected static Point[] polygon2Hull;
-    protected static int polygon2Count;
-    protected static int polygon2HullCount;
 
     protected static Point[] mergedPolygon;
 
@@ -297,12 +308,12 @@ public class tangent {
 
     public static void main(String[] args) throws IOException {
         BufferedWriter bw = new BufferedWriter(new FileWriter("tangent.out"));
-        BufferedReader br = new BufferedReader(new FileReader("tangent.inp"));
+        BufferedReader br = new BufferedReader(new FileReader("문제해결기법/Assignment_12/test.inp"));
         StringBuilder sb = new StringBuilder();
         StringTokenizer st = null;
         int T = Integer.parseInt(br.readLine().trim());
         for (int i = 0; i < T; i++) {
-            polygon1Count = Integer.parseInt(br.readLine().trim());
+            int polygon1Count = Integer.parseInt(br.readLine().trim());
             polygon1 = new Point[polygon1Count];
             for (int j = 0; j < polygon1Count; j++) {
                 st = new StringTokenizer(br.readLine().trim());
@@ -311,7 +322,7 @@ public class tangent {
                 polygon1[j] = new Point(x, y);
             }
 
-            polygon2Count = Integer.parseInt(br.readLine().trim());
+            int polygon2Count = Integer.parseInt(br.readLine().trim());
             polygon2 = new Point[polygon2Count];
             for (int j = 0; j < polygon2Count; j++) {
                 st = new StringTokenizer(br.readLine().trim());
@@ -319,15 +330,44 @@ public class tangent {
                 int y = Integer.parseInt(st.nextToken());
                 polygon2[j] = new Point(x, y);
             }
+
             polygon1Hull = convexHull(polygon1);
-            polygon1HullCount = polygon1Hull.length;
             polygon2Hull = convexHull(polygon2);
-            polygon2HullCount = polygon2Hull.length;
+
             determinePosition(polygon1, polygon2);
+            // if (!isAAboveB) {
+            // Point[] temp1 = new Point[polygon1Count];
+            // for (int k = 0; k < polygon1Count; k++) {
+            // temp1[k] = new Point(polygon1[k].x, polygon1[k].y);
+            // }
+            // polygon1 = polygon2;
+            // polygon2 = temp1;
+            // Point[] temp2 = new Point[polygon1Hull.length];
+            // for (int k = 0; k < polygon1Hull.length; k++) {
+            // temp2[k] = new Point(polygon1Hull[k].x, polygon1Hull[k].y);
+            // }
+            // polygon1Hull = polygon2Hull;
+            // polygon2Hull = temp2;
+            // determinePosition(polygon1, polygon2);
+            // polygon1Count = polygon1.length;
+            // polygon2Count = polygon2.length;
+            // }
+
             upperTangent = findTangent(false);
             lowerTangent = findTangent(true);
-            mergePolygonsWithTangents();
+            System.out.println("Tangent Upper : " + upperTangent[0] + ' ' + upperTangent[1]);
+            System.out.println("Tangent Lower : " + lowerTangent[0] + ' ' + lowerTangent[1]);
 
+            mergePolygonsWithTangents();
+            System.out.println("poly 1 : " + Arrays.toString(polygon1));
+            System.out.println("poly 2 : " + Arrays.toString(polygon2));
+            System.out.println("Hull 1 : " + Arrays.toString(polygon1Hull));
+            System.out.println("Hull 2 : " + Arrays.toString(polygon2Hull));
+            System.out.println("merged_polygon : " + Arrays.toString(mergedPolygon));
+            System.out.println();
+            System.out.println("A m : " + polygonArea(mergedPolygon, mergedPolygon.length));
+            System.out.println("A a : " + polygonArea(polygon1, polygon1.length));
+            System.out.println("A b : " + polygonArea(polygon2, polygon2.length));
             sb.append(String.format("%.1f",
                     Math.round((polygonArea(mergedPolygon, mergedPolygon.length)
                             - polygonArea(polygon1, polygon1.length)
@@ -335,7 +375,7 @@ public class tangent {
                     .append('\n');
 
         }
-        bw.write(sb.toString());
+        System.out.print(sb.toString());
         bw.close();
         br.close();
     }
