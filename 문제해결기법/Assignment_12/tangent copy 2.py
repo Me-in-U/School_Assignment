@@ -65,7 +65,7 @@ def findTangent(a, b, lower=False, a_is_above_b=False):
             if ori == 0:  # Collinear
                 # Break immediately if next point is not closer, no need to check distance
                 break
-            elif (ori < 0 if lower else ori > 0):
+            elif (ori <= 0 if lower else ori >= 0):
                 index_a = next_inda
                 done = False
             else:
@@ -79,7 +79,7 @@ def findTangent(a, b, lower=False, a_is_above_b=False):
             if ori == 0:  # Collinear
                 # Break immediately if next point is not closer, no need to check distance
                 break
-            elif (ori > 0 if lower else ori < 0):
+            elif (ori >= 0 if lower else ori <= 0):
                 index_b = next_indb
                 done = False
             else:

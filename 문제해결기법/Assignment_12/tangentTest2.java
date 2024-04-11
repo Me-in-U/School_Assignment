@@ -12,12 +12,14 @@ import java.util.Comparator;
 import java.util.Deque;
 import java.util.List;
 import java.util.StringTokenizer;
+import java.awt.geom.Path2D;
+import java.awt.geom.Point2D;
 
 public class tangentTest2 {
 
     public static class Point implements Comparable<Point> {
-        int x;
-        int y;
+        double x;
+        double y;
         static Point p0;
 
         Point() {
@@ -25,13 +27,13 @@ public class tangentTest2 {
             y = 0;
         }
 
-        Point(int x, int y) {
+        Point(double x, double y) {
             this.x = x;
             this.y = y;
         }
 
         static int ccw(Point a, Point b, Point c) {
-            int res = (b.y - a.y) * (c.x - b.x) -
+            double res = (b.y - a.y) * (c.x - b.x) -
                     (c.y - b.y) * (b.x - a.x);
 
             if (res == 0)
@@ -42,15 +44,15 @@ public class tangentTest2 {
         }
 
         public static void swap(Point p1, Point p2) {
-            int tempX = p1.x;
-            int tempY = p1.y;
+            double tempX = p1.x;
+            double tempY = p1.y;
             p1.x = p2.x;
             p1.y = p2.y;
             p2.x = tempX;
             p2.y = tempY;
         }
 
-        public static int distSq(Point p1, Point p2) {
+        public static double distSq(Point p1, Point p2) {
             return (p1.x - p2.x) * (p1.x - p2.x) + (p1.y - p2.y) * (p1.y - p2.y);
         }
 
@@ -73,9 +75,9 @@ public class tangentTest2 {
 
         @Override
         public int hashCode() {
-            int result = x;
+            double result = x;
             result = 31 * result + y;
-            return result;
+            return (int) result;
         }
 
         @Override
@@ -86,13 +88,13 @@ public class tangentTest2 {
 
     // 다각형 A가 다각형 B 안에 있는지 확인하는 메서드
     public static boolean isBInsideA(Point[] a, Point[] b) {
-        int maxX = Integer.MIN_VALUE;
-        int minX = Integer.MAX_VALUE;
-        int maxY = Integer.MIN_VALUE;
-        int minY = Integer.MAX_VALUE;
+        double maxX = Integer.MIN_VALUE;
+        double minX = Integer.MAX_VALUE;
+        double maxY = Integer.MIN_VALUE;
+        double minY = Integer.MAX_VALUE;
         for (Point point : a) {
-            int x = point.x;
-            int y = point.y;
+            double x = point.x;
+            double y = point.y;
             if (maxX < x)
                 maxX = x;
             if (x < minX)
@@ -103,14 +105,75 @@ public class tangentTest2 {
                 minY = y;
         }
         for (Point point : b) {
-            int x = point.x;
-            int y = point.y;
-            if (!(minX <= x && x <= maxX &&
-                    minY <= y && y <= minY)) {
+            if (!pointInPolygon(point, a)) {
+                System.out.println("외부");
                 return false;
             }
         }
+        System.out.println("내부");
         return true;
+    }
+
+    // Checking if a point is inside a polygon
+    public static boolean pointInPolygon(Point point, Point[] polygon) {
+        Path2D path = new Path2D.Double();
+
+        // Move to the first point in the polygon
+        path.moveTo(polygon[0].x, polygon[0].y);
+
+        // Connect the points in the polygon
+        for (int i = 1; i < polygon.length; i++) {
+            path.lineTo(polygon[i].x, polygon[i].y);
+        }
+
+        // Close the path
+        path.closePath();
+
+        // Create a Point2D object for the test point
+        Point2D testPoint = new Point2D.Double(point.x, point.y);
+        // First, check if the point is on the edge of the polygon
+        if (isPointOnEdgeOfPolygon(point, polygon)) {
+            return true; // The point is on the edge of the polygon
+        }
+        // Check if the test point is inside the polygon
+        return path.contains(testPoint);
+    }
+
+    // Method to check if a point is on the edge of the polygon
+    private static boolean isPointOnEdgeOfPolygon(Point point, Point[] polygon) {
+        for (int i = 0; i < polygon.length; i++) {
+            Point p1 = polygon[i];
+            Point p2 = polygon[(i + 1) % polygon.length]; // Wrap around to the first point
+
+            if (isPointOnLineSegment(point, p1, p2)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // Method to check if a point is on a line segment
+    private static boolean isPointOnLineSegment(Point p, Point p1, Point p2) {
+        double minX = Math.min(p1.x, p2.x);
+        double maxX = Math.max(p1.x, p2.x);
+        double minY = Math.min(p1.y, p2.y);
+        double maxY = Math.max(p1.y, p2.y);
+
+        // Check if the point is within the bounds of the line segment
+        if (p.x >= minX && p.x <= maxX && p.y >= minY && p.y <= maxY) {
+            double dy = p2.y - p1.y;
+            double dx = p2.x - p1.x;
+            // To avoid division by zero in the slope calculation
+            if (dx == 0) {
+                return p.x == p1.x;
+            }
+            double slope = dy / dx;
+            double intercept = p1.y - (slope * p1.x);
+            // Check if the point is on the line
+            return p.y == slope * p.x + intercept;
+        }
+
+        return false;
     }
 
     static double polygonArea(Point[] points, int N) {
@@ -131,21 +194,22 @@ public class tangentTest2 {
     }
 
     public static void determinePosition(Point[] points1, Point[] points2) {
-        Point centroidA = calculateCentroid(points1);
-        Point centroidB = calculateCentroid(points2);
-
-        isAAboveB = centroidA.y > centroidB.y ? 1 : centroidA.y < centroidB.y ? 0 : -1;
-        isALeftB = centroidA.x < centroidB.x;
+        double[] centroidA = calculateCentroid(points1);
+        double[] centroidB = calculateCentroid(points2);
+        System.out.println("center X : " + " " + centroidA[0] + " " + centroidB[0]);
+        System.out.println("center Y : " + " " + centroidA[1] + " " + centroidB[1]);
+        isAAboveB = centroidA[1] > centroidB[1] ? 1 : centroidA[1] < centroidB[1] ? 0 : -1;
+        isALeftB = centroidA[0] < centroidB[0];
     }
 
-    private static Point calculateCentroid(Point[] points) {
+    private static double[] calculateCentroid(Point[] points) {
         double sumX = 0;
         double sumY = 0;
         for (Point p : points) {
             sumX += p.x;
             sumY += p.y;
         }
-        return new Point((int) (sumX / points.length), (int) (sumY / points.length));
+        return new double[] { sumX / points.length, sumY / points.length };
     }
 
     public static int[] findInitialPoints() {
@@ -213,11 +277,12 @@ public class tangentTest2 {
         int index_b = init[1];
         boolean done = false;
         while (!done) {
+            // Todo : 평행할때 최초 점으로 선택
             done = true;
             while (true) {
                 int next_index_A = (index_a + (lower ? -1 : 1) + polygon1Hull.length) % polygon1Hull.length;
                 int ori = Point.ccw(polygon2Hull[index_b], polygon1Hull[index_a], polygon1Hull[next_index_A]);
-                if ((lower && (ori < 0)) || (!lower && (ori > 0))) {
+                if ((lower && (ori <= 0)) || (!lower && (ori >= 0))) {
                     index_a = next_index_A;
                     done = false;
                 } else {
@@ -227,7 +292,7 @@ public class tangentTest2 {
             while (true) {
                 int next_index_B = (index_b + (lower ? 1 : -1) + polygon2Hull.length) % polygon2Hull.length;
                 int ori = Point.ccw(polygon1Hull[index_a], polygon2Hull[index_b], polygon2Hull[next_index_B]);
-                if ((lower && (ori > 0)) || (!lower && (ori < 0))) {
+                if ((lower && (ori >= 0)) || (!lower && (ori <= 0))) {
                     index_b = next_index_B;
                     done = false;
                 } else {
@@ -304,7 +369,7 @@ public class tangentTest2 {
 
     public static void main(String[] args) throws IOException {
         BufferedWriter bw = new BufferedWriter(new FileWriter("tangent.out"));
-        BufferedReader br = new BufferedReader(new FileReader("문제해결기법/Assignment_12/test.inp"));
+        BufferedReader br = new BufferedReader(new FileReader("문제해결기법/Assignment_12/0.inp"));
         StringBuilder sb = new StringBuilder();
         StringTokenizer st = null;
         int T = Integer.parseInt(br.readLine().trim());
@@ -350,9 +415,9 @@ public class tangentTest2 {
             System.out.println("Hull 2 : " + Arrays.toString(polygon2Hull));
             System.out.println("merged_polygon : " + Arrays.toString(mergedPolygon));
             System.out.println();
-            System.out.println("Area m : " + polygonArea(mergedPolygon, mergedPolygon.length));
-            System.out.println("Area a : " + polygonArea(polygon1, polygon1.length));
-            System.out.println("Area b : " + polygonArea(polygon2, polygon2.length));
+            System.out.println("Area m : " + String.format("%.1f", polygonArea(mergedPolygon, mergedPolygon.length)));
+            System.out.println("Area a : " + String.format("%.1f", polygonArea(polygon1, polygon1.length)));
+            System.out.println("Area b : " + String.format("%.1f", polygonArea(polygon2, polygon2.length)));
             double totalArea = polygonArea(mergedPolygon, mergedPolygon.length);
             if (isBInsideA(mergedPolygon, polygon1)) {
                 System.out.println("polygon1 included");
@@ -375,13 +440,13 @@ public class tangentTest2 {
 
     public static Point[] convexHull(Point[] points) {
         Point[] copy = deepCopyArray(points);
-        int minX = copy[0].x;
-        int minY = copy[0].y;
+        double minX = copy[0].x;
+        double minY = copy[0].y;
         int minIndex = 0;
         int n = copy.length;
         for (int i = 1; i < n; i++) {
-            int x = copy[i].x;
-            int y = copy[i].y;
+            double x = copy[i].x;
+            double y = copy[i].y;
             if (x < minX || (x == minX && y < minY)) {
                 minX = x;
                 minY = y;
