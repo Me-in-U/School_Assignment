@@ -9,11 +9,13 @@ import java.util.Arrays;
 import java.util.Deque;
 import java.util.List;
 import java.util.StringTokenizer;
+import java.awt.geom.Path2D;
+import java.awt.geom.Point2D;
 
 public class tangent {
     public static class Point implements Comparable<Point> {
-        int x;
-        int y;
+        double x;
+        double y;
         static Point p0;
 
         Point() {
@@ -21,13 +23,13 @@ public class tangent {
             y = 0;
         }
 
-        Point(int x, int y) {
+        Point(double x, double y) {
             this.x = x;
             this.y = y;
         }
 
         static int ccw(Point a, Point b, Point c) {
-            int res = (b.y - a.y) * (c.x - b.x) -
+            double res = (b.y - a.y) * (c.x - b.x) -
                     (c.y - b.y) * (b.x - a.x);
 
             if (res == 0)
@@ -38,15 +40,15 @@ public class tangent {
         }
 
         public static void swap(Point p1, Point p2) {
-            int tempX = p1.x;
-            int tempY = p1.y;
+            double tempX = p1.x;
+            double tempY = p1.y;
             p1.x = p2.x;
             p1.y = p2.y;
             p2.x = tempX;
             p2.y = tempY;
         }
 
-        public static int distSq(Point p1, Point p2) {
+        public static double distSq(Point p1, Point p2) {
             return (p1.x - p2.x) * (p1.x - p2.x) + (p1.y - p2.y) * (p1.y - p2.y);
         }
 
@@ -69,15 +71,90 @@ public class tangent {
 
         @Override
         public int hashCode() {
-            int result = x;
+            double result = x;
             result = 31 * result + y;
-            return result;
+            return (int) result;
         }
 
         @Override
         public String toString() {
             return "(" + x + ", " + y + ")";
         }
+    }
+
+    public static boolean isBInsideA(Point[] a, Point[] b) {
+        double maxX = Integer.MIN_VALUE;
+        double minX = Integer.MAX_VALUE;
+        double maxY = Integer.MIN_VALUE;
+        double minY = Integer.MAX_VALUE;
+        for (Point point : a) {
+            double x = point.x;
+            double y = point.y;
+            if (maxX < x)
+                maxX = x;
+            if (x < minX)
+                minX = x;
+            if (maxY < y)
+                maxY = y;
+            if (y < minY)
+                minY = y;
+        }
+        for (Point point : b) {
+            if (!pointInPolygon(point, a)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public static boolean pointInPolygon(Point point, Point[] polygon) {
+        Path2D path = new Path2D.Double();
+
+        path.moveTo(polygon[0].x, polygon[0].y);
+
+        for (int i = 1; i < polygon.length; i++) {
+            path.lineTo(polygon[i].x, polygon[i].y);
+        }
+
+        path.closePath();
+
+        Point2D testPoint = new Point2D.Double(point.x, point.y);
+        if (isPointOnEdgeOfPolygon(point, polygon)) {
+            return true;
+        }
+        return path.contains(testPoint);
+    }
+
+    private static boolean isPointOnEdgeOfPolygon(Point point, Point[] polygon) {
+        for (int i = 0; i < polygon.length; i++) {
+            Point p1 = polygon[i];
+            Point p2 = polygon[(i + 1) % polygon.length];
+
+            if (isPointOnLineSegment(point, p1, p2)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static boolean isPointOnLineSegment(Point p, Point p1, Point p2) {
+        double minX = Math.min(p1.x, p2.x);
+        double maxX = Math.max(p1.x, p2.x);
+        double minY = Math.min(p1.y, p2.y);
+        double maxY = Math.max(p1.y, p2.y);
+
+        if (p.x >= minX && p.x <= maxX && p.y >= minY && p.y <= maxY) {
+            double dy = p2.y - p1.y;
+            double dx = p2.x - p1.x;
+            if (dx == 0) {
+                return p.x == p1.x;
+            }
+            double slope = dy / dx;
+            double intercept = p1.y - (slope * p1.x);
+            return p.y == slope * p.x + intercept;
+        }
+
+        return false;
     }
 
     static double polygonArea(Point[] points, int N) {
@@ -98,21 +175,20 @@ public class tangent {
     }
 
     public static void determinePosition(Point[] points1, Point[] points2) {
-        Point centroidA = calculateCentroid(points1);
-        Point centroidB = calculateCentroid(points2);
-
-        isAAboveB = centroidA.y > centroidB.y ? 1 : centroidA.y < centroidB.y ? 0 : -1;
-        isALeftB = centroidA.x < centroidB.x;
+        double[] centroidA = calculateCentroid(points1);
+        double[] centroidB = calculateCentroid(points2);
+        isAAboveB = centroidA[1] > centroidB[1] ? 1 : centroidA[1] < centroidB[1] ? 0 : -1;
+        isALeftB = centroidA[0] < centroidB[0];
     }
 
-    private static Point calculateCentroid(Point[] points) {
+    private static double[] calculateCentroid(Point[] points) {
         double sumX = 0;
         double sumY = 0;
         for (Point p : points) {
             sumX += p.x;
             sumY += p.y;
         }
-        return new Point((int) (sumX / points.length), (int) (sumY / points.length));
+        return new double[] { sumX / points.length, sumY / points.length };
     }
 
     public static int[] findInitialPoints() {
@@ -178,12 +254,22 @@ public class tangent {
         int index_a = init[0];
         int index_b = init[1];
         boolean done = false;
+        boolean findParallel_A = false;
+        int parallelIndex_A = -1;
+        boolean findParallel_B = false;
+        int parallelIndex_B = -1;
         while (!done) {
             done = true;
             while (true) {
                 int next_index_A = (index_a + (lower ? -1 : 1) + polygon1Hull.length) % polygon1Hull.length;
                 int ori = Point.ccw(polygon2Hull[index_b], polygon1Hull[index_a], polygon1Hull[next_index_A]);
-                if ((lower && (ori < 0)) || (!lower && (ori > 0))) {
+                if ((lower && (ori <= 0)) || (!lower && (ori >= 0))) {
+                    if (ori == 0 && !findParallel_A) {
+                        parallelIndex_A = index_a;
+                        findParallel_A = true;
+                    } else {
+                        findParallel_A = false;
+                    }
                     index_a = next_index_A;
                     done = false;
                 } else {
@@ -193,7 +279,13 @@ public class tangent {
             while (true) {
                 int next_index_B = (index_b + (lower ? 1 : -1) + polygon2Hull.length) % polygon2Hull.length;
                 int ori = Point.ccw(polygon1Hull[index_a], polygon2Hull[index_b], polygon2Hull[next_index_B]);
-                if ((lower && (ori > 0)) || (!lower && (ori < 0))) {
+                if ((lower && (ori >= 0)) || (!lower && (ori <= 0))) {
+                    if (ori == 0 && !findParallel_B) {
+                        parallelIndex_B = index_b;
+                        findParallel_B = true;
+                    } else {
+                        findParallel_B = false;
+                    }
                     index_b = next_index_B;
                     done = false;
                 } else {
@@ -203,6 +295,12 @@ public class tangent {
             if (done) {
                 break;
             }
+        }
+        if (findParallel_A) {
+            index_a = parallelIndex_A;
+        }
+        if (findParallel_B) {
+            index_b = parallelIndex_B;
         }
         return new Point[] { polygon1Hull[index_a], polygon2Hull[index_b] };
     }
@@ -220,7 +318,7 @@ public class tangent {
             if (currentIndex == lowerAIdx) {
                 break;
             }
-            currentIndex = (currentIndex + 1) % polygon1.length;
+            currentIndex = (currentIndex - 1 + polygon1.length) % polygon1.length;
         }
         currentIndex = lowerBIdx;
         while (true) {
@@ -228,7 +326,7 @@ public class tangent {
             if (currentIndex == upperBIdx) {
                 break;
             }
-            currentIndex = (currentIndex + 1) % polygon2.length;
+            currentIndex = (currentIndex - 1 + polygon2.length) % polygon2.length;
         }
         mergedPolygon = new Point[mergedPolygonList.size()];
         mergedPolygon = mergedPolygonList.toArray(mergedPolygon);
@@ -240,7 +338,7 @@ public class tangent {
                 return i;
             }
         }
-        return -1; // Not found
+        return -1;
     }
 
     protected static Point[] polygon1;
@@ -294,13 +392,19 @@ public class tangent {
 
             upperTangent = findTangent(false);
             lowerTangent = findTangent(true);
-            mergePolygonsWithTangents();
-            sb.append(String.format("%.1f",
-                    Math.round((polygonArea(mergedPolygon, mergedPolygon.length)
-                            - polygonArea(polygon1, polygon1.length)
-                            - polygonArea(polygon2, polygon2.length)) * 10) / 10.0))
-                    .append('\n');
 
+            mergePolygonsWithTangents();
+            double totalArea = polygonArea(mergedPolygon, mergedPolygon.length);
+            if (isBInsideA(mergedPolygon, polygon1)) {
+                totalArea -= polygonArea(polygon1, polygon1.length);
+            }
+            if (isBInsideA(mergedPolygon, polygon2)) {
+                totalArea -= polygonArea(polygon2, polygon2.length);
+            }
+            sb.append(String.format("%.1f",
+                    Math.round(totalArea * 10)
+                            / 10.0))
+                    .append('\n');
         }
         bw.write(sb.toString());
         bw.close();
@@ -309,13 +413,13 @@ public class tangent {
 
     public static Point[] convexHull(Point[] points) {
         Point[] copy = deepCopyArray(points);
-        int minX = copy[0].x;
-        int minY = copy[0].y;
+        double minX = copy[0].x;
+        double minY = copy[0].y;
         int minIndex = 0;
         int n = copy.length;
         for (int i = 1; i < n; i++) {
-            int x = copy[i].x;
-            int y = copy[i].y;
+            double x = copy[i].x;
+            double y = copy[i].y;
             if (x < minX || (x == minX && y < minY)) {
                 minX = x;
                 minY = y;
