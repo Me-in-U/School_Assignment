@@ -1,5 +1,3 @@
-package 문제해결기법.Assignment_14;
-
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileReader;
@@ -32,7 +30,7 @@ public class crt {
     }
 
     public static void main(String[] args) throws IOException {
-        BufferedReader br = new BufferedReader(new FileReader("문제해결기법\\Assignment_14\\2.inp"));
+        BufferedReader br = new BufferedReader(new FileReader("crt.inp"));
         BufferedWriter bw = new BufferedWriter(new FileWriter("crt.out"));
         StringBuilder sb = new StringBuilder();
         int T = Integer.parseInt(br.readLine());
