@@ -28,9 +28,9 @@ public class tangent {
             this.y = y;
         }
 
-        static int ccw(Point a, Point b, Point c) {
-            double res = (b.y - a.y) * (c.x - b.x) -
-                    (c.y - b.y) * (b.x - a.x);
+        static int ccw(Point p, Point q, Point r) {
+            double res = (q.y - p.y) * (r.x - q.x) -
+                    (r.y - q.y) * (q.x - p.x);
 
             if (res == 0)
                 return 0;
