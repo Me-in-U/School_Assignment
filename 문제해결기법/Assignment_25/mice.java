@@ -1,3 +1,5 @@
+package 문제해결기법.Assignment_25;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileReader;
@@ -132,8 +134,8 @@ public class mice {
     }
 
     public static void main(String[] args) throws IOException {
-        BufferedWriter bw = new BufferedWriter(new FileWriter("mice.out"));
-        BufferedReader br = new BufferedReader(new FileReader("mice.inp"));
+        BufferedWriter bw = new BufferedWriter(new FileWriter("문제해결기법\\Assignment_25\\mice.out"));
+        BufferedReader br = new BufferedReader(new FileReader("문제해결기법\\Assignment_25\\1.inp"));
         StringBuilder sb = new StringBuilder();
 
         int T = Integer.parseInt(br.readLine());
