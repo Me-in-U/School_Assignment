@@ -1,17 +1,42 @@
-def evenAdd(L):
-    return sum(x for x in L if x % 2 == 0)
 
-def evenAvg(total, L):
-    count = evenCount(total, L)
-    return total / count if count != 0 else 0
+import random
+import math
 
-def evenCount(total, L):
-    return len([x for x in L if x % 2 == 0])
 
-if __name__ == '__main__':
-    print("모듈 테스트")
-    test_list = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-    total = evenAdd(test_list)
-    avg = evenAvg(total, test_list)
-    count = evenCount(total, test_list)
-    print(f"짝수총합: {total}, 평균: {avg}, 짝수개수: {count}")
+def trailing_zeros(x):
+    """ Counting number of trailing zeros 
+    in the binary representation of x."""
+    if x == 0:
+        return 1
+    count = 0
+    while x & 1 == 0:
+        count += 1
+        x >>= 1
+    return count
+
+
+def flajolet_martin(dataset, k):
+    """Number of distinct elements using
+    the Flajolet-Martin Algorithm."""
+    max_zeros = 0
+    for i in range(k):
+        hash_vals = [trailing_zeros(random.choice(dataset))
+                     for _ in range(len(dataset))]
+        max_zeros = max(max_zeros, max(hash_vals))
+
+    return 2 ** max_zeros
+
+
+# Example
+dataset = [2,
+           10,
+           34,
+           1,
+           4,
+           7,
+           8,
+           6,
+           3,
+           144]
+dist_num = flajolet_martin(dataset, 10)
+print("Estimated number of distinct elements:", dist_num)
